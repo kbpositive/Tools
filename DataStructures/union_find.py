@@ -1,6 +1,7 @@
 import random
 import string
 
+
 # create random set of lowercase ascii characters
 
 random_string = lambda n : ''.join(random.sample(string.ascii_lowercase, n))
@@ -51,6 +52,6 @@ for i in range(2):
   rand_list = random.sample(list(tree), len(tree))
   pairings.extend([[rand_list[i], rand_list[i + (len(tree) //  2)]] for i in range(len(tree) //  2)])
 
-print('Default Nodes:\n' + '\n'.join(['{} - {}, {}'.format(item[0], item[1][1], item[1][0]) for item in tree.items()]))
-print('Pairings:\n' + '\n'.join(['{} - {}'.format(pair[0], pair[1]) for pair in pairings]))
-print('Minimum Spanning Tree:\n' + '\n'.join(['{} - {}, {}'.format(item[0], item[1][1], item[1][0]) for item in union_find(tree, pairings).items()]))
+#print('Default Nodes:\n' + '\n'.join(['{} - {}, {}'.format(item[0], item[1][1], item[1][0]) for item in tree.items()]))
+#print('Pairings:\n' + '\n'.join(['{} - {}'.format(pair[0], pair[1]) for pair in pairings]))
+#print('Minimum Spanning Tree:\n' + '\n'.join(['{} - {}, {}'.format(item[0], item[1][1], item[1][0]) for item in union_find(tree, pairings).items()]))
