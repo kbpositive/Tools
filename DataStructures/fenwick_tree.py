@@ -1,4 +1,4 @@
-def fenwick_tree(values):
+def f_tree(values):
   n = len(values)
   tree = values[:]
   for i in range(1, n):
