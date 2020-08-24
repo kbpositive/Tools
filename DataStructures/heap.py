@@ -27,7 +27,7 @@ def delete(type, heap: list):
     return item
 
 
-def insert(type, item, heap: list) -> object:
+def insert(type, item, heap: list):
     heap.extend([item])
     element = len(heap) - 1
     if type == 'max':
@@ -43,3 +43,9 @@ def insert(type, item, heap: list) -> object:
         heap[(element - 1) // 2] = temp
         element = (element - 1) // 2
 
+
+def make_heap(arr: list, type: str) -> list:
+    temp = []
+    for i in arr:
+        insert(type, i, temp)
+    return temp
