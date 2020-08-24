@@ -1,4 +1,4 @@
-def f_tree(values):
+def tree(values):
   n = len(values)
   tree = values[:]
   for i in range(1, n):
