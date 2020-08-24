@@ -1,7 +1,3 @@
-import random
-
-# create fenwick tree
-
 def fenwick_tree(values):
   n = len(values)
   tree = values[:]
@@ -11,8 +7,6 @@ def fenwick_tree(values):
       tree[j] += tree[i]
   return tree
 
-# prefix sum
-
 def prefix_sum(tree, n):
   sum = 0
   while n:
@@ -20,28 +14,10 @@ def prefix_sum(tree, n):
     n -= (n & -n)
   return sum
 
-# range query
-
 def range_query(tree, a, b):
   return prefix_sum(tree, b) - prefix_sum(tree, a-1)
-
-# point update
 
 def point_update(tree, pos, val):
   while pos < len(tree):
     tree[pos] += val
     pos += pos & -pos
-
-
-array = [0] + [random.choice(range(-5, 20)) for i in range(1000)]
-print(array[:20])
-
-ft = fenwick_tree(array)
-print(ft[:20])
-
-point_update(ft, 2, -5)
-print(ft[:20])
-
-print(range_query(ft, 700, 840))
-
-print(prefix_sum(ft, 900))
