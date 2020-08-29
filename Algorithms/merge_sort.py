@@ -4,7 +4,7 @@ def merge_sort(arr: list) -> list:
     elif len(arr) < 3:
         return [min(arr), max(arr)]
     middle = len(arr) // 2
-    temp =  []
+    temp = []
     left = merge_sort(arr[:middle])
     right = merge_sort(arr[middle:])
     for i in range(len(left) + len(right)):
