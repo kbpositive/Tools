@@ -9,7 +9,7 @@ def dfs_dict(graph, function, visited=None):
             dfs_dict(node, function, visited)
 
 
-# for DataStructures.Types.tree.TreeNode types
+# for DataStructures.Components.tree.TreeNode types
 def dfs_tree(tree, function):
     function(tree)
     for child in tree.node:
