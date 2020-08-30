@@ -1,23 +1,26 @@
-def tree(values):
-  n = len(values)
-  tree = values[:]
-  for i in range(1, n):
-    j = i + (i & -i)
-    if j < n:
-      tree[j] += tree[i]
-  return tree
+class FenwickTree:
+    def __init__(self, vals=None):
+        if vals is None:
+            vals = []
+        self.vals = vals
+        length = len(self.vals)
+        if length > 1:
+            for element in range(1, length):
+                sub_root = element + (element & -1)
+                if sub_root < length:
+                    self.vals[sub_root] += self.vals[element]
 
-def prefix_sum(tree, n):
-  sum = 0
-  while n:
-    sum += tree[n]
-    n -= (n & -n)
-  return sum
+    def prefix_sum(self, index: int) -> int:
+        total = 0
+        while index:
+            total += self.vals[index]
+            index -= (index & -index)
+        return total
 
-def range_query(tree, a, b):
-  return prefix_sum(tree, b) - prefix_sum(tree, a-1)
+    def range_query(self, start: int, end: int) -> int:
+        return self.prefix_sum(end) - self.prefix_sum(start - 1)
 
-def point_update(tree, pos, val):
-  while pos < len(tree):
-    tree[pos] += val
-    pos += pos & -pos
+    def point_update(self, pos, val):
+        while pos < len(self.vals):
+            self.vals[pos] += val
+            pos += pos & -pos
