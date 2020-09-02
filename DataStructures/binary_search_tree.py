@@ -9,16 +9,19 @@ class BinarySearchTree:
     def insert(self, item, node):
         if node is None:
             self.root = tree_node.Node(item, None, None)
+            self.size += 1
         elif item is node.val:
             raise ValueError('Node already exists!')
         elif node.val > item:
             if node.left is None:
                 node.left = tree_node.Node(item, None, None)
+                self.size += 1
             else:
                 self.insert(item, node.left)
         else:
             if node.right is None:
                 node.right = tree_node.Node(item, None, None)
+                self.size += 1
             else:
                 self.insert(item, node.right)
 
@@ -31,16 +34,19 @@ class BinarySearchTree:
             if root.left is None:
                 temp = root.right
                 del root
+                self.size -= 1
                 return temp
             if root.right is None:
                 temp = root.left
                 del root
+                self.size -= 1
                 return temp
             temp = root.right
             while temp.left is not None:
                 temp = temp.left
             root.val = temp.val
             del temp
+            self.size -= 1
         return root
 
     def search(self, item, node=None, traversal='inorder'):
