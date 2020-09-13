@@ -1,4 +1,4 @@
-from DataStructures.AbstractDataTypes import tree_node
+from DataStructures.AbstractDataTypes import tree
 
 
 class BinarySearchTree:
@@ -8,22 +8,17 @@ class BinarySearchTree:
 
     def insert(self, item, node):
         if node is None:
-            self.root = tree_node.Node(item, None, None)
-            self.size += 1
-        elif item is node.val:
-            raise ValueError('Node already exists!')
-        elif node.val > item:
-            if node.left is None:
-                node.left = tree_node.Node(item, None, None)
-                self.size += 1
-            else:
-                self.insert(item, node.left)
+            return tree.Node(item, None, None)
         else:
-            if node.right is None:
-                node.right = tree_node.Node(item, None, None)
+            if item is node.val:
+                return node
+            elif node.val < item:
+                node.right = self.insert(item, node.right)
                 self.size += 1
             else:
-                self.insert(item, node.right)
+                node.left = self.insert(item, node.left)
+                self.size += 1
+        return node
 
     def remove(self, item, root):
         if root.val > item:
