@@ -45,30 +45,17 @@ class BinarySearchTree:
             self.size -= 1
         return root
 
-    def traversal(self, item, node=None, order='in'):
+    def traversal(self, node=None, order='in'):
         if node is None:
             return None
-        if order == 'pre' and node.val != item:
+        if order == 'pre':
             self.func(node.val)
-            if item < node.val:
-                self.traversal(item, node.left, order)
-            else:
-                self.traversal(item, node.right, order)
-        elif order == 'in' and node.val != item:
-            if item < node.val:
-                self.traversal(item, node.left, order)
+        self.traversal(node.left, order)
+        if order == 'in':
             self.func(node.val)
-            if item > node.val:
-                self.traversal(item, node.right, order)
-        elif order == 'post' and node.val != item:
-            if item < node.val:
-                self.traversal(item, node.left, order)
-            else:
-                self.traversal(item, node.right, order)
+        self.traversal(node.right, order)
+        if order == 'post':
             self.func(node.val)
-        else:
-            self.func(node.val)
-            return node
 
     def find(self, item, node=None):
         if node is None:
