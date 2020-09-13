@@ -5,18 +5,17 @@ class AVLTree:
 	def __init__(self):
 		self.root = None
 		self.size = 0
-		self.func = print
+		self.func = lambda x: print(x.val)
 
 	def update(self, node):
 		lh = -1
 		rh = -1
-		if node.left is not None:
+		if node.left:
 			lh = node.left.height
-		if node.right is not None:
+		if node.right:
 			rh = node.right.height
 		node.height = 1 + max([lh, rh])
 		node.bf = rh - lh
-		return node
 
 	def rotate(self, child, direction: str):
 		if direction == 'right':
@@ -47,12 +46,12 @@ class AVLTree:
 			return self.case('rr', node)
 
 	def balance(self, node):
-		if node.bf == -2:
+		if node.bf < -1:
 			if node.left.bf <= 0:
 				return self.case('ll', node)
 			else:
 				return self.case('lr', node)
-		elif node.bf == 2:
+		elif node.bf > 1:
 			if node.right.bf >= 0:
 				return self.case('rr', node)
 			else:
@@ -67,15 +66,17 @@ class AVLTree:
 				return node
 			elif node.val < item:
 				node.right = self.insert(item, node.right)
+				node.right.parent = node
 				self.size += 1
 			else:
 				node.left = self.insert(item, node.left)
+				node.left.parent = node
 				self.size += 1
 		self.update(node)
 		return self.balance(node)
 
 	def remove(self, item, node):
-		if node is None:
+		if not node:
 			return node
 		elif node.val > item:
 			node.left = self.remove(item, node.left)
@@ -84,33 +85,34 @@ class AVLTree:
 		else:
 			if node.left is None:
 				temp = node.right
-				del node
+				node = None
 				self.size -= 1
 				return temp
-			if node.right is None:
+			elif node.right is None:
 				temp = node.left
-				del node
+				node = None
 				self.size -= 1
 				return temp
 			temp = node.right
 			while temp.left is not None:
 				temp = temp.left
 			node.val = temp.val
-			del temp
+			node.right = self.remove(temp.val, node.right)
 			self.size -= 1
-		return node
+		self.update(node)
+		return self.balance(node)
 
 	def traversal(self, node=None, order='in'):
 		if node is None:
 			return None
 		if order == 'pre':
-			self.func(node.val)
+			self.func(node)
 		self.traversal(node.left, order)
 		if order == 'in':
-			self.func(node.val)
+			self.func(node)
 		self.traversal(node.right, order)
 		if order == 'post':
-			self.func(node.val)
+			self.func(node)
 
 	def find(self, item, node=None):
 		if node is None:
@@ -122,10 +124,3 @@ class AVLTree:
 				return self.find(item, node.right)
 		else:
 			return node
-
-h = AVLTree()
-
-for i in range(20):
-	h.root = h.insert(i%10, h.root)
-
-h.traversal(h.root, 'post')

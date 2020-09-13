@@ -5,7 +5,7 @@ class BinarySearchTree:
     def __init__(self):
         self.root = None
         self.size = 0
-        self.func = print
+        self.func = lambda x: print(x.val)
 
     def insert(self, item, node):
         if node is None:
@@ -21,7 +21,7 @@ class BinarySearchTree:
                 self.size += 1
         return node
 
-    def remove(self, item, node):
+    def remove(self, item, node=None):
         if node is None:
             return node
         elif node.val > item:
@@ -31,19 +31,19 @@ class BinarySearchTree:
         else:
             if node.left is None:
                 temp = node.right
-                del node
+                node = None
                 self.size -= 1
                 return temp
-            if node.right is None:
+            elif node.right is None:
                 temp = node.left
-                del node
+                node = None
                 self.size -= 1
                 return temp
             temp = node.right
             while temp.left is not None:
                 temp = temp.left
             node.val = temp.val
-            del temp
+            temp = None
             self.size -= 1
         return node
 
@@ -51,13 +51,13 @@ class BinarySearchTree:
         if node is None:
             return None
         if order == 'pre':
-            self.func(node.val)
+            self.func(node)
         self.traversal(node.left, order)
         if order == 'in':
-            self.func(node.val)
+            self.func(node)
         self.traversal(node.right, order)
         if order == 'post':
-            self.func(node.val)
+            self.func(node)
 
     def find(self, item, node=None):
         if node is None:
