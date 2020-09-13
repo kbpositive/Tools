@@ -5,6 +5,7 @@ class BinarySearchTree:
     def __init__(self):
         self.root = None
         self.size = 0
+        self.func = print
 
     def insert(self, item, node):
         if node is None:
@@ -44,27 +45,38 @@ class BinarySearchTree:
             self.size -= 1
         return root
 
-    def search(self, item, node=None, traversal='inorder'):
+    def traversal(self, item, node=None, order='in'):
         if node is None:
             return None
-        if traversal == 'preorder' and node.val is not item:
-            print(node.val)
+        if order == 'pre' and node.val != item:
+            self.func(node.val)
             if item < node.val:
-                self.search(item, node.left, traversal)
+                self.traversal(item, node.left, order)
             else:
-                self.search(item, node.right, traversal)
-        elif traversal == 'inorder' and node.val is not item:
+                self.traversal(item, node.right, order)
+        elif order == 'in' and node.val != item:
             if item < node.val:
-                self.search(item, node.left, traversal)
-            print(node.val)
+                self.traversal(item, node.left, order)
+            self.func(node.val)
             if item > node.val:
-                self.search(item, node.right, traversal)
-        elif traversal == 'postorder' and node.val is not item:
+                self.traversal(item, node.right, order)
+        elif order == 'post' and node.val != item:
             if item < node.val:
-                self.search(item, node.left, traversal)
+                self.traversal(item, node.left, order)
             else:
-                self.search(item, node.right, traversal)
-            print(node.val)
+                self.traversal(item, node.right, order)
+            self.func(node.val)
         else:
-            print(node.val)
+            self.func(node.val)
+            return node
+
+    def find(self, item, node=None):
+        if node is None:
+            return 'Item not found.'
+        elif node.val != item:
+            if item < node.val:
+                return self.find(item, node.left)
+            else:
+                return self.find(item, node.right)
+        else:
             return node
