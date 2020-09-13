@@ -21,29 +21,31 @@ class BinarySearchTree:
                 self.size += 1
         return node
 
-    def remove(self, item, root):
-        if root.val > item:
-            root.left = self.remove(item, root.left)
-        elif root.val < item:
-            root.right = self.remove(item, root.right)
+    def remove(self, item, node):
+        if node is None:
+            return node
+        elif node.val > item:
+            node.left = self.remove(item, node.left)
+        elif node.val < item:
+            node.right = self.remove(item, node.right)
         else:
-            if root.left is None:
-                temp = root.right
-                del root
+            if node.left is None:
+                temp = node.right
+                del node
                 self.size -= 1
                 return temp
-            if root.right is None:
-                temp = root.left
-                del root
+            if node.right is None:
+                temp = node.left
+                del node
                 self.size -= 1
                 return temp
-            temp = root.right
+            temp = node.right
             while temp.left is not None:
                 temp = temp.left
-            root.val = temp.val
+            node.val = temp.val
             del temp
             self.size -= 1
-        return root
+        return node
 
     def traversal(self, node=None, order='in'):
         if node is None:
