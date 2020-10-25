@@ -6,7 +6,7 @@ def gen(nodes):
     b = a[:]
     random.shuffle(a)
     random.shuffle(b)
-    grph = {pair[0]:{pair[1]: random.randint(1,9)} for pair in zip(a, b)}
+    grph = {pair[0]: {pair[1]: random.randint(1, 9)} for pair in zip(a, b)}
     return grph
 
 

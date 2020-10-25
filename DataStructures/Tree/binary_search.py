@@ -1,4 +1,4 @@
-from DataStructures.Tree.Nodes import vanilla
+from DataStructures.Tree.Nodes import regular
 
 
 class Tree:
@@ -9,7 +9,7 @@ class Tree:
 
     def insert_node(self, item, node):
         if node is None:
-            return vanilla.Node(item, None, None)
+            return regular.Node(item, None, None)
         else:
             if item is node.val:
                 return node

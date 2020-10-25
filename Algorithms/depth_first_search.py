@@ -1,17 +1,7 @@
-# for dictionary graphs
-def dfs_dict(graph, function, visited=None):
-    if visited is None:
-        visited = set()
-    function(graph)
-    for node in graph:
-        if node not in visited:
-            visited.add(node)
-            dfs_dict(node, function, visited)
-
-
-# for DataStructures.Components.tree.TreeNode types
+# for DataStructures.Tree.Nodes.regular types
 def dfs_tree(tree, function):
     function(tree)
-    for child in tree.node:
-        if child:
-            dfs_tree(child, function)
+    if tree.left:
+        dfs_tree(tree.left, function)
+    if tree.right:
+        dfs_tree(tree.right, function)
