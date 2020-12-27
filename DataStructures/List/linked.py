@@ -27,7 +27,7 @@ class List:
         if pos == 'after':
             if item is not None:
                 while current:
-                    if current.val is item:
+                    if item == current.val:
                         node.nxt = current.nxt
                         current.nxt = node
                         return
@@ -49,7 +49,7 @@ class List:
                 return
         elif pos == 'before':
             if item is not None:
-                if current.val is item:
+                if item == current.val:
                     self.head = Node(val,self.head)
                     return
                 elif current.nxt:
@@ -79,6 +79,52 @@ class List:
         else:
             return "Invalid position. Please use 'before' or 'after'."
 
+    def remove(self, pos='last', item=None, indx=None):
+        if self.head:
+            current = self.head
+        else:
+            return
+
+        if item is not None:
+            if item == current.val:
+                self.head = self.head.nxt
+                return
+            else:
+                while current.nxt:
+                    if item == current.nxt.val:
+                        current.nxt = current.nxt.nxt
+                        return
+                    current = current.nxt
+            return "Item not found."
+        elif indx is not None:
+            if indx > 0:
+                if current.nxt:
+                    while current.nxt.nxt and indx:
+                        current = current.nxt
+                        indx -= 1
+                    current.nxt = current.nxt.nxt
+                    return
+                else:
+                    return "Index out of range."
+            else:
+                self.head = self.head.nxt
+        else:
+            if pos == 'last':
+                if current.nxt:
+                    if current.nxt.nxt:
+                        while current.nxt.nxt:
+                            current = current.nxt
+                        current.nxt = None
+                        return
+                    else:
+                        self.head.nxt = None
+                else:
+                    self.head = None
+            elif pos == 'first':
+                self.head = self.head.nxt
+                return
+            else:
+                return "Invalid position. Please use 'first' or 'last'."
 # examples
 l = List()
 l.insert(1)
@@ -89,4 +135,5 @@ l.insert(0.75,'before',1)
 l.insert(0.25,'after',indx=0)
 l.insert(1.2,'after',indx=4)
 l.insert(0.9,'before',indx=3)
+l.remove(indx=2)
 l.traverse()
