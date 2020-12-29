@@ -125,15 +125,3 @@ class List:
                 return
             else:
                 return "Invalid position. Please use 'first' or 'last'."
-# examples
-l = List()
-l.insert(1)
-l.insert(1.25)
-l.insert(0,'before')
-l.insert(1.15,'after',1)
-l.insert(0.75,'before',1)
-l.insert(0.25,'after',indx=0)
-l.insert(1.2,'after',indx=4)
-l.insert(0.9,'before',indx=3)
-l.remove(indx=2)
-l.traverse()
