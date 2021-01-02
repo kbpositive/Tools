@@ -1,4 +1,9 @@
 from DataStructures.Tree.Nodes import regular
+class Node:
+	def __init__(self, val=0, left=None, right=None):
+		self.val = val
+		self.left = left
+		self.right = right
 
 
 class Tree:
@@ -7,22 +12,25 @@ class Tree:
         self.size = 0
         self.func = lambda x: print(x.val)
 
-    def insert_node(self, item, node):
-        if node is None:
-            return regular.Node(item, None, None)
-        else:
-            if item is node.val:
-                return node
-            elif node.val < item:
-                node.right = self.insert_node(item, node.right)
-                self.size += 1
-            else:
-                node.left = self.insert_node(item, node.left)
-                self.size += 1
-        return node
-
     def insert(self, item):
-        self.root = self.insert_node(item, self.root)
+        if self.root is None:
+            self.root = Node(item)
+            return
+        current = self.root
+        while current.val != item:
+            if current.val < item:
+                if current.right:
+                    current = current.right
+                else:
+                    current.right = Node(item)
+                    return
+            elif current.val > item:
+                if current.left:
+                    current = current.left
+                else:
+                    current.left = Node(item)
+                    return
+        return "Item already exists."
 
     def remove_node(self, item, node=None):
         if node is None:
@@ -53,20 +61,38 @@ class Tree:
     def remove(self, item):
         self.remove_node(item, self.root)
 
-    def traverse_tree(self, node, order):
-        if node is None:
-            return None
-        if order == 'pre':
-            self.func(node)
-        self.traverse_tree(node.left, order)
-        if order == 'in':
-            self.func(node)
-        self.traverse_tree(node.right, order)
-        if order == 'post':
-            self.func(node)
-
-    def traversal(self, order='in'):
-        self.traverse_tree(self.root, order)
+    def traverse(self, order='in'):
+        if self.root is not None:
+            current = self.root
+            stack = []
+            if order == 'pre':
+                self.func(node)
+                self.traverse(node.left, order)
+            elif order == 'in':
+                if current is not None:
+                    while current is not None:
+                        stack.append(current)
+                        current = current.left
+                    current = stack.pop()
+                    self.func(current)
+                    current = current.right
+                else:
+                    current = stack.pop()
+                while stack:
+                    if current is not None:
+                        while current is not None:
+                            stack.append(current)
+                            current = current.left
+                        current = stack.pop()
+                        self.func(current)
+                        current = current.right
+                    else:
+                        current = stack.pop()
+            elif order == 'post':
+                self.func(node)
+            else:
+                return "Invalid search order."
+        return "Empty Tree."
 
     def find_node(self, item, node=None):
         if node is None:
@@ -81,3 +107,8 @@ class Tree:
 
     def find(self, item):
         return self.find_node(item, self.root)
+
+t = Tree()
+for i in range(10):
+    t.insert(i)
+t.traverse()
