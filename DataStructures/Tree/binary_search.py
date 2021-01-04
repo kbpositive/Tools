@@ -1,4 +1,3 @@
-from DataStructures.Tree.Nodes import regular
 class Node:
 	def __init__(self, val=0, left=None, right=None):
 		self.val = val
@@ -66,33 +65,49 @@ class Tree:
             current = self.root
             stack = []
             if order == 'pre':
-                self.func(node)
-                self.traverse(node.left, order)
-            elif order == 'in':
-                if current is not None:
-                    while current is not None:
+                while True:
+                    if current:
+                        self.func(current)
                         stack.append(current)
                         current = current.left
-                    current = stack.pop()
-                    self.func(current)
-                    current = current.right
-                else:
-                    current = stack.pop()
-                while stack:
-                    if current is not None:
-                        while current is not None:
-                            stack.append(current)
-                            current = current.left
+                    else:
+                        if stack:
+                            current = stack.pop()
+                            current = current.right
+                        else:
+                            break
+            elif order == 'in':
+                while True:
+                    if current:
+                        stack.append(current)
+                        current = current.left
+                    else:
+                        if stack:
+                            current = stack.pop()
+                            self.func(current)
+                            current = current.right
+                        else:
+                            break
+            elif order == 'post':
+                while current or stack:
+                    while current:
+                        stack.append(current)
+                        current = current.left
+                    current = stack[-1].right
+                    if current is None:
                         current = stack.pop()
                         self.func(current)
-                        current = current.right
-                    else:
-                        current = stack.pop()
-            elif order == 'post':
-                self.func(node)
+                        while stack and stack[-1].right and current.val == stack[-1].right.val:
+                            current = stack.pop()
+                            self.func(current)
+                        if stack:
+                            current = stack[-1].right
+                        else:
+                            current = None
             else:
                 return "Invalid search order."
-        return "Empty Tree."
+        else:
+            return "Empty Tree."
 
     def find_node(self, item, node=None):
         if node is None:
@@ -109,6 +124,18 @@ class Tree:
         return self.find_node(item, self.root)
 
 t = Tree()
-for i in range(10):
-    t.insert(i)
-t.traverse()
+t.insert(5)
+t.insert(2)
+t.insert(4)
+t.insert(3)
+t.insert(0)
+t.insert(1)
+t.insert(8)
+t.insert(6)
+t.insert(7)
+t.insert(10)
+t.insert(9)
+t.traverse('pre')
+
+t.traverse('in')
+t.traverse('post')
