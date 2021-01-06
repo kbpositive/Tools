@@ -89,21 +89,30 @@ class Tree:
                         else:
                             break
             elif order == 'post':
-                while current or stack:
+                while True:
                     while current:
                         stack.append(current)
+                        # pre order
+                        # self.func(current)
                         current = current.left
-                    current = stack[-1].right
-                    if current is None:
-                        current = stack.pop()
-                        self.func(current)
-                        while stack and stack[-1].right and current.val == stack[-1].right.val:
-                            current = stack.pop()
-                            self.func(current)
-                        if stack:
+                        if current is None:
+                            # in order
+                            # self.func(current)
                             current = stack[-1].right
+                    while current == stack[-1].right:
+                        current = stack.pop()
+                        # post order
+                        self.func(current)
+                        if stack:
+                            if current != stack[-1].right:
+                                # in order
+                                # self.func(current)
+                                current = stack[-1].right
+                                break
                         else:
-                            current = None
+                            break
+                    if not stack:
+                        break
             else:
                 return "Invalid search order."
         else:
