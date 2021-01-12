@@ -9,11 +9,11 @@ class Tree:
     def __init__(self):
         self.root = None
         self.size = 0
-        self.func = lambda x: print(x.val)
 
     def insert(self, item):
         if self.root is None:
             self.root = Node(item)
+            self.size += 1
             return
         current = self.root
         while current.val != item:
@@ -22,14 +22,16 @@ class Tree:
                     current = current.right
                 else:
                     current.right = Node(item)
+                    self.size += 1
                     return
             elif current.val > item:
                 if current.left:
                     current = current.left
                 else:
                     current.left = Node(item)
+                    self.size += 1
                     return
-        return "Item already exists."
+        raise Exception("Item already exists.")
 
     def remove_node(self, item, node=None):
         if node is None:
@@ -61,69 +63,46 @@ class Tree:
         self.remove_node(item, self.root)
 
     def traverse(self, order='in'):
-        if self.root is not None:
-            current = self.root
+        if self.root is None:
+            raise Exception("Empty Tree.")
+        else:
+            orders ={n:True for n in ['pre','in','post','level']}
+            output = []
             stack = []
-            if order == 'pre':
-                while True:
-                    if current:
-                        self.func(current)
-                        stack.append(current)
-                        current = current.left
-                    else:
-                        if stack:
-                            current = stack.pop()
-                            current = current.right
-                        else:
-                            break
-            elif order == 'in':
-                while True:
-                    if current:
-                        stack.append(current)
-                        current = current.left
-                    else:
-                        if stack:
-                            current = stack.pop()
-                            self.func(current)
-                            current = current.right
-                        else:
-                            break
-            elif order == 'post':
-                while True:
-                    if current:
-                        while current:
-                            stack.append(current)
-                            # pre order
-                            # self.func(current)
-                            current = current.left
-                            if current is None:
-                                # in order
-                                # self.func(current)
-                                current = stack[-1].right
-                    else:
-                        while stack and current == stack[-1].right:
-                            current = stack.pop()
-                            # post order
-                            self.func(current)
-                        if stack:
-                            # in order
-                            # self.func(current)
-                            current = stack[-1].right
-                        else:
-                            break
+            current = self.root
+            if order not in orders:
+                raise Exception("Invalid search order.")
             elif order == 'level':
                 queue = [current]
                 while queue:
                     current = queue.pop(0)
-                    self.func(current)
+                    output.append(current.val)
                     if current.left:
                         queue.append(current.left)
                     if current.right:
                         queue.append(current.right)
             else:
-                return "Invalid search order."
-        else:
-            return "Empty Tree."
+                while True:
+                    while current:
+                        stack.append(current)
+                        if order == 'pre':
+                            output.append(stack[-1].val)
+                        current = current.left
+                        if current is None:
+                            if order == 'in':
+                                output.append(stack[-1].val)
+                            current = stack[-1].right
+                    while stack and current == stack[-1].right:
+                        if order == 'post':
+                            output.append(stack[-1].val)
+                        current = stack.pop()
+                    if stack:
+                        if order == 'in':
+                            output.append(stack[-1].val)
+                        current = stack[-1].right
+                    else:
+                        break
+            return output
 
     def find_node(self, item, node=None):
         if node is None:
@@ -139,20 +118,15 @@ class Tree:
     def find(self, item):
         return self.find_node(item, self.root)
 
-t = Tree()
-t.insert(5)
-t.insert(2)
-t.insert(4)
-t.insert(3)
-t.insert(0)
-t.insert(1)
-t.insert(8)
-t.insert(6)
-t.insert(7)
-t.insert(10)
-t.insert(9)
-t.traverse('pre')
+if __name__ == '__main__':
+    T = Tree()
+    vals = [5,2,4,3,0,1,8,6,7,10]
+    for value in vals:
+        T.insert(value)
 
-t.traverse('in')
-t.traverse('post')
-t.traverse('level')
+    assert T.traverse('pre') == [5, 2, 0, 1, 4, 3, 8, 6, 7, 10]
+    assert T.traverse('in') == [0, 1, 2, 3, 4, 5, 6, 7, 8, 10]
+    assert T.traverse('post') == [1, 0, 3, 4, 2, 7, 6, 10, 8, 5]
+    assert T.traverse('level') == [5, 2, 8, 0, 4, 6, 10, 1, 3, 7]
+
+    print("Pass")
