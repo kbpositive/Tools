@@ -90,29 +90,36 @@ class Tree:
                             break
             elif order == 'post':
                 while True:
-                    while current:
-                        stack.append(current)
-                        # pre order
-                        # self.func(current)
-                        current = current.left
-                        if current is None:
-                            # in order
+                    if current:
+                        while current:
+                            stack.append(current)
+                            # pre order
                             # self.func(current)
-                            current = stack[-1].right
-                    while current == stack[-1].right:
-                        current = stack.pop()
-                        # post order
-                        self.func(current)
-                        if stack:
-                            if current != stack[-1].right:
+                            current = current.left
+                            if current is None:
                                 # in order
                                 # self.func(current)
                                 current = stack[-1].right
-                                break
+                    else:
+                        while stack and current == stack[-1].right:
+                            current = stack.pop()
+                            # post order
+                            self.func(current)
+                        if stack:
+                            # in order
+                            # self.func(current)
+                            current = stack[-1].right
                         else:
                             break
-                    if not stack:
-                        break
+            elif order == 'level':
+                queue = [current]
+                while queue:
+                    current = queue.pop(0)
+                    self.func(current)
+                    if current.left:
+                        queue.append(current.left)
+                    if current.right:
+                        queue.append(current.right)
             else:
                 return "Invalid search order."
         else:
@@ -148,3 +155,4 @@ t.traverse('pre')
 
 t.traverse('in')
 t.traverse('post')
+t.traverse('level')
