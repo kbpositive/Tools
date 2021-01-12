@@ -128,5 +128,6 @@ if __name__ == '__main__':
     assert T.traverse('in') == [0, 1, 2, 3, 4, 5, 6, 7, 8, 10]
     assert T.traverse('post') == [1, 0, 3, 4, 2, 7, 6, 10, 8, 5]
     assert T.traverse('level') == [5, 2, 8, 0, 4, 6, 10, 1, 3, 7]
+    assert T.size == 10
 
     print("Pass")
