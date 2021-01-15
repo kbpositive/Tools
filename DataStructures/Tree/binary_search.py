@@ -24,7 +24,7 @@ class Tree:
                     current.right = Node(item)
                     self.size += 1
                     return
-            elif current.val > item:
+            elif item < current.val:
                 if current.left:
                     current = current.left
                 else:
