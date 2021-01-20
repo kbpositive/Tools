@@ -12,6 +12,7 @@ class Tree:
 
     def insert(self, item):
         previous = self.root
+
         if previous:
             current = {0:previous.left, 1:previous.right}[previous.val < item]
 
@@ -24,6 +25,7 @@ class Tree:
 
             if previous.val < item:
                 previous.right = Node(item)
+
             else:
                 previous.left = Node(item)
 
@@ -33,16 +35,39 @@ class Tree:
         self.size += 1
 
     def remove(self, item):
-        previous = self.root
-        if previous:
-            current = {0:previous.left, 1:previous.right}[previous.val < item]
+        current = self.root
 
-            while current:
+        if current:
+            next = {0:current.left, 1:current.right}[current.val < item]
+
+            while next:
                 previous = current
-                current = {0:previous.left, 1:previous.right}[previous.val < item]
+                current = next
 
-            if current.val == item:
-                raise Exception("Item already exists.")
+                if current.val != item:
+                    next = {0:current.left, 1:current.right}[current.val < item]
+                    
+                else:
+                    min = current.right
+
+                    if current.right:
+                        while min and min.left:
+                            min = min.left
+
+                        min.left = current.left
+                        min.right = current.right
+
+                    elif current.left:
+                        min = current.left
+
+                    if previous.val < item:
+                        previous.right = min
+
+                    else:
+                        previous.left = min
+
+                    return
+
         raise Exception("Item not in tree.")
 
     def print_tree(self, order='in'):
@@ -113,4 +138,6 @@ if __name__ == '__main__':
     assert T.print_tree('level') == [5, 2, 8, 0, 4, 6, 10, 1, 3, 7]
     assert T.size == 10
 
+    T.remove(2)
+    print(T.print_tree('pre'))
     print("Pass")
