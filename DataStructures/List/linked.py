@@ -40,8 +40,8 @@ class List:
             current.next = Node(item, current.next)
 
         # if the current node is pointing to the list's head,
-        # the list is empty which means the newly created node
-        # is pointing to None and we can make this new node the head
+        # the list is empty, the newly created node is pointing
+        # to None, and we can make this new node the head
         else:
             self.head = current
 
