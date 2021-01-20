@@ -19,20 +19,33 @@ class List:
         return listToPrint
 
     def insert_at_index(self, item, index):
+        # create new node with val=item, pointing to head
         current = Node(item, self.head)
 
+        # iterate until either the list node or index
+        # are equal to None or 0 respectively
         while current.next and (index > 0):
             current = current.next
             index -= 1
 
+        # if index is not 0, the given index is out of the lists range
         if index != 0:
             raise Exception("Index out of range.")
 
+        # if index is 0, the insertion point of the list has been reached
+
+        # if the current node is not pointing to the list's head,
+        # the list is not empty and the insertion point is the next node
         if current.next != self.head:
             current.next = Node(item, current.next)
+
+        # if the current node is pointing to the list's head,
+        # the list is empty which means the newly created node
+        # is pointing to None and we can make this new node the head
         else:
             self.head = current
 
+        # increment the list's size parameter
         self.size += 1
 
     def insert_at_item(self, item, search):
@@ -145,5 +158,5 @@ if __name__ == '__main__':
 
     assert L.print_list() == [4,2,1,9,8,5,5,4,0]
     assert L.length == 9
-    
+
     print("Pass")
