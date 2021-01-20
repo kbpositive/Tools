@@ -11,58 +11,41 @@ class Tree:
         self.size = 0
 
     def insert(self, item):
-        if self.root is None:
-            self.root = Node(item)
-            self.size += 1
-            return
-        current = self.root
-        while current.val != item:
-            if current.val < item:
-                if current.right:
-                    current = current.right
-                else:
-                    current.right = Node(item)
-                    self.size += 1
-                    return
-            elif item < current.val:
-                if current.left:
-                    current = current.left
-                else:
-                    current.left = Node(item)
-                    self.size += 1
-                    return
-        raise Exception("Item already exists.")
+        previous = self.root
+        if previous:
+            current = {0:previous.left, 1:previous.right}[previous.val < item]
 
-    def remove_node(self, item, node=None):
-        if node is None:
-            return node
-        elif node.val > item:
-            node.left = self.remove_node(item, node.left)
-        elif node.val < item:
-            node.right = self.remove_node(item, node.right)
+            while current:
+                previous = current
+                current = {0:previous.left, 1:previous.right}[previous.val < item]
+
+            if previous.val == item:
+                raise Exception("Item already exists.")
+
+            if previous.val < item:
+                previous.right = Node(item)
+            else:
+                previous.left = Node(item)
+
         else:
-            if node.left is None:
-                temp = node.right
-                node = None
-                self.size -= 1
-                return temp
-            elif node.right is None:
-                temp = node.left
-                node = None
-                self.size -= 1
-                return temp
-            temp = node.right
-            while temp.left is not None:
-                temp = temp.left
-            node.val = temp.val
-            temp = None
-            self.size -= 1
-        return node
+            self.root = Node(item)
+
+        self.size += 1
 
     def remove(self, item):
-        self.remove_node(item, self.root)
+        previous = self.root
+        if previous:
+            current = {0:previous.left, 1:previous.right}[previous.val < item]
 
-    def traverse(self, order='in'):
+            while current:
+                previous = current
+                current = {0:previous.left, 1:previous.right}[previous.val < item]
+
+            if current.val == item:
+                raise Exception("Item already exists.")
+        raise Exception("Item not in tree.")
+
+    def print_tree(self, order='in'):
         if self.root is None:
             raise Exception("Empty Tree.")
         else:
@@ -124,10 +107,10 @@ if __name__ == '__main__':
     for value in vals:
         T.insert(value)
 
-    assert T.traverse('pre') == [5, 2, 0, 1, 4, 3, 8, 6, 7, 10]
-    assert T.traverse('in') == [0, 1, 2, 3, 4, 5, 6, 7, 8, 10]
-    assert T.traverse('post') == [1, 0, 3, 4, 2, 7, 6, 10, 8, 5]
-    assert T.traverse('level') == [5, 2, 8, 0, 4, 6, 10, 1, 3, 7]
+    assert T.print_tree('pre') == [5, 2, 0, 1, 4, 3, 8, 6, 7, 10]
+    assert T.print_tree('in') == [0, 1, 2, 3, 4, 5, 6, 7, 8, 10]
+    assert T.print_tree('post') == [1, 0, 3, 4, 2, 7, 6, 10, 8, 5]
+    assert T.print_tree('level') == [5, 2, 8, 0, 4, 6, 10, 1, 3, 7]
     assert T.size == 10
 
     print("Pass")
