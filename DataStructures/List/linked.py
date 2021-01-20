@@ -22,8 +22,7 @@ class List:
         # create new node with val=item, pointing to head
         current = Node(item, self.head)
 
-        # iterate until either the list node or index
-        # are equal to None or 0 respectively
+        # iterate until either the list node is None or the index is 0
         while current.next and (index > 0):
             current = current.next
             index -= 1
@@ -40,8 +39,8 @@ class List:
             current.next = Node(item, current.next)
 
         # if the current node is pointing to the list's head,
-        # the list is empty, the newly created node is pointing
-        # to None, and we can make this new node the head
+        # the list is empty or the insertion point is the head.
+        # In this case, we can make the current/new node the head.
         else:
             self.head = current
 
