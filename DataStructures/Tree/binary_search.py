@@ -54,33 +54,27 @@ class Tree:
 
 
     def insert(self, item):
-        # create iterator and set to root
-        current = self.root
+        if self.root:
+            # create iterator and set to root
+            current = self.root
 
-        # check for duplicates
-        if current.val == item:
-            raise Exception("Item already exists.")
+            # check for duplicates
+            if current.val == item:
+                raise Exception("Item already exists.")
 
-        # if tree is not empty, get next node based on whether
-        # current value < item
-        if current:
-            next = {0:current.left, 1:current.right}[current.val < item]
+            # while a next node exists, get next node based on whether
+            # current value < item
+            while {0:current.left, 1:current.right}[current.val < item]:
+                current = {0:current.left, 1:current.right}[current.val < item]
 
-            # while a next node exists, set the current node to the next node
-            while next:
-                current = next
-
-                # check for duplicates at each node
+                # check for duplicates at each step
                 if current.val == item:
                     raise Exception("Item already exists.")
-
-                # get next node based on whether current value < item
-                next = {0:current.left, 1:current.right}[current.val < item]
 
             # set next value (based on whether current value < item) to new node
             setattr(current, {0:'left', 1:'right'}[current.val < item], Node(item))
 
-        # if tree is empty, set the root to the inserted item
+        # otherwise, set root to the inserted item
         else:
             self.root = Node(item)
 
@@ -88,8 +82,10 @@ class Tree:
         self.size += 1
 
     def remove(self, item):
+        # create iterator and set to root
         current = self.root
 
+        # if tree is not empty
         if current:
             next = self.root
 
@@ -124,9 +120,10 @@ class Tree:
                         self.root = min
 
                     self.size -= 1
-                    return
 
-        raise Exception("Item not in tree.")
+        # otherwise the item to be deleted is not in the tree
+        else:
+            raise Exception("Item not in tree.")
 
 
 
