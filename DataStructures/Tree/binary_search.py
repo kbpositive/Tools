@@ -11,6 +11,7 @@ class Tree:
         self.size = len(self.print_tree())
 
     def print_tree(self, order='in'):
+        # TODO: refactor
         if self.root is None:
             return []
         else:
@@ -80,34 +81,71 @@ class Tree:
         self.size += 1
 
     def remove(self, item):
+        # if tree is not empty
         if self.root:
+
+            # create previous and current variables
             previous = self.root
             current = previous
+
+            # while there is a next node and the current value is not item,
+            # set previous value to current and current value to next node
             while {0:current.left, 1:current.right}[current.val < item] and current.val != item:
                 previous = current
                 current = {0:current.left, 1:current.right}[current.val < item]
 
+            # if the current value is now item, it becomes
+            # the deletion target
             if current.val == item:
-                prev = current
-                min = current.right
+
+                # set default replacement value target's right child
+                replacement = current.right
+
+                # if target has both children
                 if current.right and current.left:
-                    while min and min.left:
-                        prev = min
-                        min = min.left
-                        prev.left = min.right
-                        min.left = current.left
-                        min.right = prev
+
+                    # set parent value to target
+                    parent = current
+
+                    # while replacement exists and has a left child
+                    while replacement and replacement.left:
+
+                        # set parent value to replacement value
+                        # and replacement value to its left child
+                        parent = replacement
+                        replacement = replacement.left
+
+                    # set left child of replacement's parent
+                    # to replacement's right child; set replacement's
+                    # left child to the target's left child; set the
+                    # replacement's right child to the parent
+                    parent.left = replacement.right
+                    replacement.left = current.left
+                    replacement.right = parent
+
+                # if target only has a right node,
+                # this node becomes the replacement
                 elif current.right:
-                    min = current.right
+                    replacement = current.right
+
+                # if target only has a left node,
+                # this node becomes the replacement
                 elif current.left:
-                    min = current.left
-                if previous.val < item:
-                    previous.right = min
-                elif item < previous.val:
-                    previous.left = min
-                elif previous is self.root:
-                    self.root = min
+                    replacement = current.left
+
+                # if current is the root, set root to the replacement node
+                if current is self.root:
+                    self.root = replacement
+
+                # otherwise set the next node
+                # (based on whether previous.val < item) to the replacement node
+                else:
+                    setattr(previous, {0:'left', 1:'right'}[previous.val < item], replacement)
+
+                # increment tree size by 1
                 self.size -= 1
+
+        # otherwise, the item is not in the tree
         else:
             raise Exception("Item not in tree.")
 
