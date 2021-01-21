@@ -54,22 +54,21 @@ class Tree:
 
 
     def insert(self, item):
+        # if tree is not empty
         if self.root:
+
             # create iterator and set to root
             current = self.root
 
-            # check for duplicates
-            if current.val == item:
-                raise Exception("Item already exists.")
+            # while a next node exists, and current value is not item
+            while {0:current.left, 1:current.right}[current.val < item] and current.val != item:
 
-            # while a next node exists, get next node based on whether
-            # current value < item
-            while {0:current.left, 1:current.right}[current.val < item]:
+                # set current node to next based on whether current.val < item
                 current = {0:current.left, 1:current.right}[current.val < item]
 
-                # check for duplicates at each step
-                if current.val == item:
-                    raise Exception("Item already exists.")
+            # if current value is equal to item, the item is a duplicate
+            if current.val == item:
+                raise Exception("Item already exists.")
 
             # set next value (based on whether current value < item) to new node
             setattr(current, {0:'left', 1:'right'}[current.val < item], Node(item))
@@ -82,10 +81,8 @@ class Tree:
         self.size += 1
 
     def remove(self, item):
-        # create iterator and set to root
         current = self.root
 
-        # if tree is not empty
         if current:
             next = self.root
 
@@ -120,10 +117,9 @@ class Tree:
                         self.root = min
 
                     self.size -= 1
+                    return
 
-        # otherwise the item to be deleted is not in the tree
-        else:
-            raise Exception("Item not in tree.")
+        raise Exception("Item not in tree.")
 
 
 
