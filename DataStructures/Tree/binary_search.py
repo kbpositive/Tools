@@ -10,77 +10,6 @@ class Tree:
         self.root = root
         self.size = len(self.print_tree())
 
-    def insert(self, item):
-        previous = self.root
-
-        if previous:
-            current = {0:previous.left, 1:previous.right}[previous.val < item]
-
-            while current:
-                previous = current
-                current = {0:previous.left, 1:previous.right}[previous.val < item]
-
-            if previous.val == item:
-                raise Exception("Item already exists.")
-
-            if previous.val < item:
-                previous.right = Node(item)
-
-            else:
-                previous.left = Node(item)
-
-        else:
-            self.root = Node(item)
-
-        self.size += 1
-
-    def remove(self, item):
-        current = self.root
-
-        if current:
-            next = self.root
-
-            while next:
-                previous = current
-                current = next
-
-                if current.val != item:
-                    next = {0:current.left, 1:current.right}[current.val < item]
-
-                else:
-                    prev = current
-                    min = current.right
-
-                    if current.right and current.left:
-
-                        while min and min.left:
-                            prev = min
-                            min = min.left
-
-                        prev.left = min.right
-                        min.left = current.left
-                        min.right = prev
-
-                    elif current.right:
-                        min = current.right
-
-                    elif current.left:
-                        min = current.left
-
-                    if previous.val < item:
-                        previous.right = min
-
-                    elif item < previous.val:
-                        previous.left = min
-
-                    elif previous is self.root:
-                        self.root = min
-
-                    self.size -= 1
-                    return
-
-        raise Exception("Item not in tree.")
-
     def print_tree(self, order='in'):
         if self.root is None:
             return []
@@ -123,19 +52,83 @@ class Tree:
                         break
             return output
 
-    def find_node(self, item, node=None):
-        if node is None:
-            raise ValueError('Item not found.')
-        elif node.val != item:
-            if item < node.val:
-                return self.find_node(item, node.left)
-            else:
-                return self.find_node(item, node.right)
-        else:
-            return node
 
-    def find(self, item):
-        return self.find_node(item, self.root)
+    def insert(self, item):
+        # create iterator and set to root
+        current = self.root
+
+        # check for duplicates
+        if current.val == item:
+            raise Exception("Item already exists.")
+
+        # if tree is not empty, get next node based on whether
+        # current value < item
+        if current:
+            next = {0:current.left, 1:current.right}[current.val < item]
+
+            # while a next node exists, set the current node to the next node
+            while next:
+                current = next
+
+                # check for duplicates at each node
+                if current.val == item:
+                    raise Exception("Item already exists.")
+
+                # get next node based on whether current value < item
+                next = {0:current.left, 1:current.right}[current.val < item]
+
+            # set next value (based on whether current value < item) to new node
+            setattr(current, {0:'left', 1:'right'}[current.val < item], Node(item))
+
+        # if tree is empty, set the root to the inserted item
+        else:
+            self.root = Node(item)
+
+        # increment tree size by 1
+        self.size += 1
+
+    def remove(self, item):
+        current = self.root
+
+        if current:
+            next = self.root
+
+            while next:
+                previous = current
+                current = next
+
+                if current.val != item:
+                    next = {0:current.left, 1:current.right}[current.val < item]
+
+                else:
+                    prev = current
+                    min = current.right
+
+                    if current.right and current.left:
+                        while min and min.left:
+                            prev = min
+                            min = min.left
+                        prev.left = min.right
+                        min.left = current.left
+                        min.right = prev
+                    elif current.right:
+                        min = current.right
+                    elif current.left:
+                        min = current.left
+
+                    if previous.val < item:
+                        previous.right = min
+                    elif item < previous.val:
+                        previous.left = min
+                    elif previous is self.root:
+                        self.root = min
+
+                    self.size -= 1
+                    return
+
+        raise Exception("Item not in tree.")
+
+
 
 if __name__ == '__main__':
     A = Tree()
