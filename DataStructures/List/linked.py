@@ -18,7 +18,11 @@ class List:
 
         return listToPrint
 
-    def insert_at_index(self, item, index):
+    def insert_at_index(self, item, index=None):
+        # set default index to the end of the list
+        if index is None:
+            index = self.length
+
         # create new node with val=item, pointing to head
         current = Node(item, self.head)
 
@@ -47,7 +51,7 @@ class List:
         # increment the list's size parameter
         self.size += 1
 
-    def insert_at_item(self, item, search):
+    def insert_at_item(self, item, search=None):
         current = Node(item, self.head)
 
         while current.next and current.next.val != search:
