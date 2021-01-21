@@ -6,9 +6,9 @@ class Node:
 
 
 class Tree:
-    def __init__(self):
-        self.root = None
-        self.size = 0
+    def __init__(self, root=None):
+        self.root = root
+        self.size = len(self.print_tree())
 
     def insert(self, item):
         previous = self.root
@@ -38,7 +38,7 @@ class Tree:
         current = self.root
 
         if current:
-            next = {0:current.left, 1:current.right}[current.val < item]
+            next = self.root
 
             while next:
                 previous = current
@@ -46,16 +46,23 @@ class Tree:
 
                 if current.val != item:
                     next = {0:current.left, 1:current.right}[current.val < item]
-                    
+
                 else:
+                    prev = current
                     min = current.right
 
-                    if current.right:
+                    if current.right and current.left:
+
                         while min and min.left:
+                            prev = min
                             min = min.left
 
+                        prev.left = min.right
                         min.left = current.left
-                        min.right = current.right
+                        min.right = prev
+
+                    elif current.right:
+                        min = current.right
 
                     elif current.left:
                         min = current.left
@@ -63,16 +70,20 @@ class Tree:
                     if previous.val < item:
                         previous.right = min
 
-                    else:
+                    elif item < previous.val:
                         previous.left = min
 
+                    elif previous is self.root:
+                        self.root = min
+
+                    self.size -= 1
                     return
 
         raise Exception("Item not in tree.")
 
     def print_tree(self, order='in'):
         if self.root is None:
-            raise Exception("Empty Tree.")
+            return []
         else:
             orders ={n:True for n in ['pre','in','post','level']}
             output = []
@@ -127,17 +138,40 @@ class Tree:
         return self.find_node(item, self.root)
 
 if __name__ == '__main__':
+    A = Tree()
+    B = Tree()
+    C = Tree()
+    D = Tree()
+    E = Tree()
     T = Tree()
-    vals = [5,2,4,3,0,1,8,6,7,10]
+    vals = [5,2,4,3,0,1,8,6,7,10,9]
     for value in vals:
+        A.insert(value)
+        B.insert(value)
+        C.insert(value)
+        D.insert(value)
+        E.insert(value)
         T.insert(value)
 
-    assert T.print_tree('pre') == [5, 2, 0, 1, 4, 3, 8, 6, 7, 10]
-    assert T.print_tree('in') == [0, 1, 2, 3, 4, 5, 6, 7, 8, 10]
-    assert T.print_tree('post') == [1, 0, 3, 4, 2, 7, 6, 10, 8, 5]
-    assert T.print_tree('level') == [5, 2, 8, 0, 4, 6, 10, 1, 3, 7]
-    assert T.size == 10
+    assert T.print_tree('pre') == [5, 2, 0, 1, 4, 3, 8, 6, 7, 10, 9]
+    assert T.print_tree('in') == [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+    assert T.print_tree('post') == [1, 0, 3, 4, 2, 7, 6, 9, 10, 8, 5]
+    assert T.print_tree('level') == [5, 2, 8, 0, 4, 6, 10, 1, 3, 7, 9]
+    assert T.size == 11
 
-    T.remove(2)
-    print(T.print_tree('pre'))
+    A.remove(8)
+    assert A.print_tree('level') == [5,2,9,0,4,6,10,1,3,7]
+
+    B.remove(5)
+    assert B.print_tree('level') == [6,2,8,0,4,7,10,1,3,9]
+
+    C.remove(0)
+    assert C.print_tree('level') == [5,2,8,1,4,6,10,3,7,9]
+
+    D.remove(10)
+    assert D.print_tree('level') == [5,2,8,0,4,6,9,1,3,7]
+
+    E.remove(7)
+    assert E.print_tree('level') == [5,2,8,0,4,6,10,1,3,9]
+
     print("Pass")
