@@ -1,8 +1,8 @@
 class Node:
-	def __init__(self, val=0, left=None, right=None):
-		self.val = val
-		self.left = left
-		self.right = right
+    def __init__(self, val=0, left=None, right=None):
+        self.val = val
+        self.left = left
+        self.right = right
 
 
 class Tree:
@@ -52,7 +52,6 @@ class Tree:
                         break
             return output
 
-
     def insert(self, item):
         # if tree is not empty
         if self.root:
@@ -81,45 +80,36 @@ class Tree:
         self.size += 1
 
     def remove(self, item):
-        current = self.root
-
-        if current:
-            next = self.root
-
-            while next:
+        if self.root:
+            previous = self.root
+            current = previous
+            while {0:current.left, 1:current.right}[current.val < item] and current.val != item:
                 previous = current
-                current = next
+                current = {0:current.left, 1:current.right}[current.val < item]
 
-                if current.val != item:
-                    next = {0:current.left, 1:current.right}[current.val < item]
-
-                else:
-                    prev = current
-                    min = current.right
-
-                    if current.right and current.left:
-                        while min and min.left:
-                            prev = min
-                            min = min.left
+            if current.val == item:
+                prev = current
+                min = current.right
+                if current.right and current.left:
+                    while min and min.left:
+                        prev = min
+                        min = min.left
                         prev.left = min.right
                         min.left = current.left
                         min.right = prev
-                    elif current.right:
-                        min = current.right
-                    elif current.left:
-                        min = current.left
-
-                    if previous.val < item:
-                        previous.right = min
-                    elif item < previous.val:
-                        previous.left = min
-                    elif previous is self.root:
-                        self.root = min
-
-                    self.size -= 1
-                    return
-
-        raise Exception("Item not in tree.")
+                elif current.right:
+                    min = current.right
+                elif current.left:
+                    min = current.left
+                if previous.val < item:
+                    previous.right = min
+                elif item < previous.val:
+                    previous.left = min
+                elif previous is self.root:
+                    self.root = min
+                self.size -= 1
+        else:
+            raise Exception("Item not in tree.")
 
 
 
