@@ -81,10 +81,9 @@ class Tree:
         self.size += 1
 
     def remove(self, item):
-        # if tree is not empty
+        # if tree is not empty create previous
+        # and current variables, both set to the root
         if self.root:
-
-            # create previous and current variables
             previous = self.root
             current = previous
 
@@ -94,24 +93,21 @@ class Tree:
                 previous = current
                 current = {0:current.left, 1:current.right}[current.val < item]
 
-            # if the current value is now item, it becomes
-            # the deletion target
+            # if current value is equal to item, current becomes
+            # the deletion target with its right child as the default
+            # replacement
             if current.val == item:
-
-                # set default replacement value target's right child
                 replacement = current.right
 
                 # if target has both children
+                # set parent value to target
                 if current.right and current.left:
-
-                    # set parent value to target
                     parent = current
 
                     # while replacement exists and has a left child
+                    # set parent value to replacement value
+                    # and replacement value to its left child
                     while replacement and replacement.left:
-
-                        # set parent value to replacement value
-                        # and replacement value to its left child
                         parent = replacement
                         replacement = replacement.left
 
@@ -123,22 +119,18 @@ class Tree:
                     replacement.left = current.left
                     replacement.right = parent
 
-                # if target only has a right node,
+                # if target only has either a left or right node,
                 # this node becomes the replacement
                 elif current.right:
                     replacement = current.right
-
-                # if target only has a left node,
-                # this node becomes the replacement
                 elif current.left:
                     replacement = current.left
 
                 # if current is the root, set root to the replacement node
-                if current is self.root:
-                    self.root = replacement
-
                 # otherwise set the next node
                 # (based on whether previous.val < item) to the replacement node
+                if current is self.root:
+                    self.root = replacement
                 else:
                     setattr(previous, {0:'left', 1:'right'}[previous.val < item], replacement)
 
