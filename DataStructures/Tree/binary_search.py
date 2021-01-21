@@ -10,26 +10,34 @@ class Tree:
         self.root = root
         self.size = len(self.print_tree())
 
+    def level_print(self):
+        if self.root is None:
+            return []
+        else:
+            output = []
+            stack = []
+            current = self.root
+            queue = [current]
+            while queue:
+                current = queue.pop(0)
+                output.append(current.val)
+                if current.left:
+                    queue.append(current.left)
+                if current.right:
+                    queue.append(current.right)
+        return output
+
     def print_tree(self, order='in'):
         # TODO: refactor
         if self.root is None:
             return []
         else:
-            orders ={n:True for n in ['pre','in','post','level']}
+            orders ={n:True for n in ['pre','in','post']}
             output = []
             stack = []
             current = self.root
             if order not in orders:
                 raise Exception("Invalid search order.")
-            elif order == 'level':
-                queue = [current]
-                while queue:
-                    current = queue.pop(0)
-                    output.append(current.val)
-                    if current.left:
-                        queue.append(current.left)
-                    if current.right:
-                        queue.append(current.right)
             else:
                 while True:
                     while current:
@@ -162,22 +170,22 @@ if __name__ == '__main__':
     assert T.print_tree('pre') == [5, 2, 0, 1, 4, 3, 8, 6, 7, 10, 9]
     assert T.print_tree('in') == [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
     assert T.print_tree('post') == [1, 0, 3, 4, 2, 7, 6, 9, 10, 8, 5]
-    assert T.print_tree('level') == [5, 2, 8, 0, 4, 6, 10, 1, 3, 7, 9]
+    assert T.level_print() == [5, 2, 8, 0, 4, 6, 10, 1, 3, 7, 9]
     assert T.size == 11
 
     A.remove(8)
-    assert A.print_tree('level') == [5,2,9,0,4,6,10,1,3,7]
+    assert A.level_print() == [5,2,9,0,4,6,10,1,3,7]
 
     B.remove(5)
-    assert B.print_tree('level') == [6,2,8,0,4,7,10,1,3,9]
+    assert B.level_print() == [6,2,8,0,4,7,10,1,3,9]
 
     C.remove(0)
-    assert C.print_tree('level') == [5,2,8,1,4,6,10,3,7,9]
+    assert C.level_print() == [5,2,8,1,4,6,10,3,7,9]
 
     D.remove(10)
-    assert D.print_tree('level') == [5,2,8,0,4,6,9,1,3,7]
+    assert D.level_print() == [5,2,8,0,4,6,9,1,3,7]
 
     E.remove(7)
-    assert E.print_tree('level') == [5,2,8,0,4,6,10,1,3,9]
+    assert E.level_print() == [5,2,8,0,4,6,10,1,3,9]
 
     print("Pass")
