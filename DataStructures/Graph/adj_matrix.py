@@ -1,12 +1,10 @@
 class Graph:
     def __init__(self, edges):
-        self.edges = {}
-        for edge in edges:
-            self.edges[frozenset(edge[:2])] = edge[2]
+        self.edges = []
         self.vertices = {}
         self.matrix = []
-        for edgeSet in self.edges.items():
-            self.add_edge((list(edgeSet[0]) + [edgeSet[1]]))
+        for edge in edges:
+            self.add_edge(edge)
         for vertex in self.vertices:
             self.add_vertex(vertex)
 
@@ -18,14 +16,13 @@ class Graph:
             self.matrix.append([0 for row in range(len(self.matrix)+1)])
 
     def add_edge(self, edge):
-        edgeData = list(edge)
-        self.add_vertex(edgeData[0])
-        self.add_vertex(edgeData[1])
-        self.edges[frozenset(edgeData[:2])] = edgeData[2]
-        row = self.vertices[edgeData[0]]
-        col = self.vertices[edgeData[1]]
-        self.matrix[row][col] = edgeData[2]
-        self.matrix[col][row] = -edgeData[2]
+        self.add_vertex(edge[0])
+        self.add_vertex(edge[1])
+        self.edges.append(edge)
+        row = self.vertices[edge[0]]
+        col = self.vertices[edge[1]]
+        self.matrix[row][col] = edge[2]
+        self.matrix[col][row] = -edge[2]
 
     @property
     def m(self):
@@ -37,15 +34,26 @@ class Graph:
 
 
 if __name__ == '__main__':
-    G = Graph({(1,2,4),(1,3,3),(1,4,2),(2,3,7),(4,3,2),(3,5,9),(4,5,5)})
+    G = Graph([[1,2,4],[1,3,3],[1,4,2],[2,3,7],[4,3,2],[3,5,9],[4,5,5]])
 
+    G.add_edge([3,6,1])
+    G.add_edge([3,7,8])
+    G.add_edge([4,6,2])
+    G.add_edge([4,7,6])
+    G.add_edge([5,7,3])
+
+    assert G.m == 12
+    assert G.n == 7
     def print_graph(graph):
         print("",end="\t")
         for vertex in graph.vertices:
-            p
+            print(str(vertex),end="\t")
+        print("")
         for row in graph.vertices:
+            print(str(row),end="\t")
             for col in graph.vertices:
                 print(graph.matrix[graph.vertices[row]][graph.vertices[col]],end="\t")
             print("")
+
     print_graph(G)
     print("pass")
