@@ -21,8 +21,8 @@ class Graph:
         self.edges.append(edge)
         row = self.vertices[edge[0]]
         col = self.vertices[edge[1]]
-        self.matrix[row][col] = edge[2]
-        self.matrix[col][row] = -edge[2]
+        self.matrix[row][col] = -edge[2]
+        self.matrix[col][row] = edge[2]
 
     @property
     def m(self):
