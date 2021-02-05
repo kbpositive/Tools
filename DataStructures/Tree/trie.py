@@ -18,7 +18,7 @@ class Trie:
                     trie.letter[ord(word[0])-97] = Node(word[0])
                     self.add(trie.letter[ord(word[0])-97],word[1:])
                 else:
-                    trie.letter[ord(word[0])-97] = Node(word[0])
+                    trie.letter[ord(word[0])-97].val = word[0]
                     trie.letter[ord(word[0])-97].end = True
             else:
                 trie.end = True
@@ -33,6 +33,9 @@ class Trie:
                     print('-',end='')
                 else:
                     print('\n',end='')
+                    if key.letter != [None]*len(self.alphabet):
+                        print('  '*count+key.val,end='-')
+
                 self.print_trie(key,count+1)
 
 if __name__ == '__main__':
@@ -49,5 +52,12 @@ if __name__ == '__main__':
     tr.add(tr.root,'taste')
     tr.add(tr.root,'teacher')
     tr.add(tr.root,'parasaur')
+    tr.add(tr.root,'general')
+    tr.add(tr.root,'generalize')
+    tr.add(tr.root,'generalization')
+    tr.add(tr.root,'generalizational')
+    tr.add(tr.root,'generalizationalize')
+    tr.add(tr.root,'generalizationalization')
+    
     tr.print_trie(tr.root,0)
     print('pass')
