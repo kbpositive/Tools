@@ -17,20 +17,18 @@ class Trie:
             current = current.letters[ord(letter)-97]
         current.end = True
 
-    def print_trie(self,node,count):
-        if node:
-            for index,key in enumerate([l for l in node.letters if l]):
-                if index > 0:
-                    print('  '*count,end='')
-                print(key.symbol,end='')
-                if key.end == False:
-                    print('-',end='')
-                else:
-                    print('\n',end='')
-                    if key.letters != [None]*len(self.alphabet):
-                        print('  '*count+key.symbol,end='-')
-
-                self.print_trie(key,count+1)
+    def print_trie(self,node,depth):
+        for count,character in enumerate([letter for letter in node.letters if letter]):
+            if count > 0:
+                print('  '*depth,end='')
+            print(character.symbol,end='')
+            if character.end == False:
+                print('-',end='')
+            else:
+                print('\n',end='')
+                if character.letters != [None]*len(self.alphabet):
+                    print('  '*(depth+1),end='')
+            self.print_trie(character,depth+1)
 
 if __name__ == '__main__':
     tr = Trie()
@@ -46,6 +44,7 @@ if __name__ == '__main__':
     tr.add('taste')
     tr.add('tasty')
     tr.add('tasteless')
+    tr.add('tastefull')
     tr.add('teacher')
     tr.add('parasaur')
     tr.add('general')
@@ -56,4 +55,4 @@ if __name__ == '__main__':
     tr.add('generalizationalization')
 
     tr.print_trie(tr.root,0)
-    print('pass')
+    print('\npass')
