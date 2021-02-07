@@ -4,7 +4,7 @@ class Node:
         self.letters = [None]*alphabet_length
         self.end = False
 
-class Trie:
+class Tree:
     def __init__(self,alphabet="abcdefghijklmnopqrstuvwxyz"):
         self.alphabet = alphabet
         self.root = Node("",len(self.alphabet))
@@ -31,7 +31,7 @@ class Trie:
             self.print_trie(character,depth+1)
 
 if __name__ == '__main__':
-    tr = Trie()
+    tr = Tree()
 
     tr.add('test')
     traverse_test = tr.root.letters[ord('t')-97].letters[ord('e')-97].letters[ord('s')-97].letters[ord('t')-97]
