@@ -1,12 +1,7 @@
 class Graph:
-    def __init__(self, edges):
-        self.edges = []
+    def __init__(self):
         self.vertices = {}
         self.matrix = []
-        for edge in edges:
-            self.add_edge(edge)
-        for vertex in self.vertices:
-            self.add_vertex(vertex)
 
     def add_vertex(self, vertex):
         if vertex not in self.vertices:
@@ -18,7 +13,6 @@ class Graph:
     def add_edge(self, edge):
         self.add_vertex(edge[0])
         self.add_vertex(edge[1])
-        self.edges.append(edge)
         row = self.vertices[edge[0]]
         col = self.vertices[edge[1]]
         self.matrix[row][col] = -edge[2]
@@ -26,7 +20,7 @@ class Graph:
 
     @property
     def m(self):
-        return len(self.edges)
+        return len([x for y in [j[i:] for i,j in enumerate(self.matrix)] for x in y if x != 0])
 
     @property
     def n(self):
@@ -34,8 +28,10 @@ class Graph:
 
 
 if __name__ == '__main__':
-    G = Graph([[1,2,4],[1,3,3],[1,4,2],[2,3,7],[4,3,2],[3,5,9],[4,5,5]])
-
+    G = Graph()
+    for edge in [[1,2,4],[1,3,3],[1,4,2],[2,3,7],[4,3,2],[3,5,9],[4,5,5]]:
+        G.add_edge(edge)
+    G.matrix
     G.add_edge([3,6,1])
     G.add_edge([3,7,8])
     G.add_edge([4,6,2])
