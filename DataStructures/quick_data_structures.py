@@ -6,9 +6,11 @@ def node(data): return [data, {0:None, 1:None}]
 
 def letter(data): return [data,[None]*128]
 
-def vertices(n): return {num:index for index,num in enumerate(random.sample(range(n),k=n))}
+def vertices(n):
+    return {num:index for index,num in enumerate(random.sample(range(n),k=n))}
 
-def edges(v,n): return [random.sample(v.keys(),k=2) for _ in range(n)]
+def edges(v,n,acyclic=True):
+    return [random.sample(v.keys(),k=2) if acyclic else random.choice(v.keys(),k=2) for _ in range(n)]
 
 def linked_list(n):
     head = link(-1)
