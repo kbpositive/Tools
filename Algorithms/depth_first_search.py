@@ -1,39 +1,46 @@
-from DataStructures.Graph import adj_list
-from DataStructures.Tree import binary_search, trie
-
 def dfs_tree(tree):
     if tree:
-        dfs_tree(tree.left)
-        print(tree.val)
-        dfs_tree(tree.right)
+        dfs_tree(tree[1][0])
+        print(tree[0])
+        dfs_tree(tree[1][1])
 
 def dfs_trie(trie):
-    print(trie.symbol)
-    for letter in [character for character in trie.letters if character]:
+    print(trie[0])
+    for letter in [character for character in trie[1] if character]:
         dfs_trie(letter)
 
-def dfs_graph(graph,node,visited):
-    if node in visited:
-        print(visited)
-        return
-    visited[node] = True
-    for neighbor in graph.vertices[node]:
-        dfs_graph(graph,neighbor,visited)
+def dfs_adj_list(graph,visited):
+    for vertex in graph:
+        if vertex in visited:
+            continue
+        visited[vertex] = True
+        print(vertex)
+        dfs_adj_list(graph[vertex],visited)
+
+def dfs_mat(graph,visited,vertex):
+    if vertex not in visited:
+        visited[vertex] = True
+        print(vertex)
+        for index,data in enumerate(graph[vertex]):
+            if data != 0:
+                dfs_mat(graph,visited,index)
+
+def dfs_adj_mat(graph, visited):
+    for node in range(len(graph)):
+        dfs_mat(graph,visited,node)
 
 
 if __name__ == '__main__':
-    bs = binary_search.Tree()
-    tr = trie.Tree()
-    grl = adj_list.Graph({(1,2),(1,3),(1,4),(2,3),(4,3),(3,5),(4,5)})
+    from DataStructures import quick_data_structures as qds
 
-    for word in ["hippopotamus","hypothermia","hyperthermia"]:
-        tr.add(word)
+    bs = qds.tree(25)
+    tr = qds.trie(["hippopotamus","hypothermia","hyperthermia"])
+    al = qds.adj_list(7,15,directed=True,acyclic=False)
+    am = qds.adj_mat(10,50,directed=True,acyclic=False,weighted=True)
 
-    for num in range(15):
-        bs.insert((num*13)%15)
+    dfs_tree(bs)
+    dfs_trie(tr)
+    dfs_adj_list(al,{})
+    dfs_adj_mat(am,{})
 
-    dfs_tree(bs.root)
-    dfs_trie(tr.root)
-    dfs_graph(grl,list(grl.vertices)[0],{})
-    
     print('\npass')
