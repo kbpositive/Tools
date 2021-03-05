@@ -1,59 +1,97 @@
 import random
 
-# linked list
-link = lambda x: [x,None]
-linked_list = link(-1)
-current = linked_list
-for n in random.sample(range(7),k=7):
-    current[1] = link(n)
-    current = current[1]
-linked_list
+def link(data): return [data, None]
 
-# tree
-node = lambda x: [x,{0:None, 1:None}]
-tree = node(-1)
-for n in random.sample(range(25),k=25):
-    current = tree
-    while current[1][current[0] < n]:
-        current = current[1][current[0] < n]
-    current[1][current[0] < n] = node(n)
-tree
+def node(data): return [data, {0:None, 1:None}]
 
-# trie
-letter = lambda x: [x,[None]*128]
-trie = letter("")
-for word in ["lions","tigers","bears"]:
-    current = trie
-    for char in word:
-        if current[1][ord(char)] is None:
-            current[1][ord(char)] = letter(char)
-        current = current[1][ord(char)]
-trie
+def letter(data): return [data,[None]*128]
 
-# graph:adjacency list
-dim = 16
-vertices = random.sample(range(dim),k=dim)
-edges = [random.sample(vertices,k=2) for _ in range(25)]
-adj_list = {}
-for pair in edges:
-    for vertex in pair:
-        if vertex not in adj_list:
-            adj_list[vertex] = {}
-    adj_list[pair[0]][pair[1]] = adj_list[pair[1]]
-adj_list
+def vertices(n): return {num:index for index,num in enumerate(random.sample(range(n),k=n))}
 
-# graph:adjacency matrix
-dim = 15
-vertices = {num:index for index,num in enumerate(random.sample(range(dim),k=dim))}
-edges = [random.sample(vertices.keys(),k=2) for _ in range(25)]
-adj_mat = [[0]*dim for i in range(dim)]
-for pair in edges:
-    for vertex in pair:
-        if vertex not in vertices:
-            vertices[vertex] = len(adj_mat)
-            adj_mat.append([0]*len(adj_mat))
-            for row in adj_mat:
-                row.append(0)
-    adj_mat[vertices[pair[0]]][vertices[pair[1]]] = 1
-    adj_mat[vertices[pair[1]]][vertices[pair[0]]] = -1
-adj_mat
+def edges(v,n): return [random.sample(v.keys(),k=2) for _ in range(n)]
+
+def linked_list(n):
+    head = link(-1)
+    current = head
+    nxt = 1
+
+    for next_num in random.sample(range(n),k=n):
+        current[nxt] = link(next_num)
+        current = current[nxt]
+    return head
+
+def tree(n):
+    root = node(-1)
+    val = 0
+    nxt = 1
+
+    for next_num in random.sample(range(n),k=n):
+        current = root
+        while current[nxt][current[val] < next_num]:
+            current = current[nxt][current[val] < next_num]
+        current[nxt][current[val] < next_num] = node(next_num)
+    return root
+
+def trie(words):
+    root = letter("")
+    nxt = 1
+
+    for word in words:
+        current = root
+        for char in word:
+            if current[nxt][ord(char)] is None:
+                current[nxt][ord(char)] = letter(char)
+            current = current[nxt][ord(char)]
+    return root
+
+def adj_list(v,e,directed=False):
+    verts = vertices(v)
+    edgs = edges(verts,e)
+    adj_list = {}
+    frm = 0
+    to = 1
+
+    for pair in edgs:
+        for vertex in pair:
+            if vertex not in adj_list:
+                adj_list[vertex] = {}
+        adj_list[pair[frm]][pair[to]] = adj_list[pair[to]]
+        if not directed:
+            adj_list[pair[to]][pair[frm]] = adj_list[pair[frm]]
+    return adj_list
+
+def adj_mat(v,e,directed=False,weighted=False):
+    verts = vertices(v)
+    edge_sets = zip(edges(verts,e), random.sample(range(e),k=e))
+    edgs = [[edge_set[0][0],edge_set[0][1],edge_set[1]] for edge_set in edge_sets]
+    adj_mat = [[0]*v for row in range(v)]
+    frm = 0
+    to = 1
+
+    for triplet in edgs:
+        for vertex in triplet:
+            if vertex not in verts:
+                verts[vertex] = len(adj_mat)
+                adj_mat.append([0]*len(adj_mat))
+                for row in adj_mat:
+                    row.append(0)
+        adj_mat[verts[triplet[frm]]][verts[triplet[to]]] = 1*(triplet[2]**int(weighted))
+        if adj_mat[verts[triplet[to]]][verts[triplet[frm]]] == 0:
+            adj_mat[verts[triplet[to]]][verts[triplet[frm]]] = (-1*(triplet[2]**int(weighted)))**int(directed)
+    return adj_mat
+
+if __name__ == '__main__':
+    # linked list
+    print(linked_list(7),end='\n\n')
+
+    # tree
+    print(tree(25))
+
+    # trie
+    print(trie(["lions","tigers","bears"]))
+
+    # graph: adjacency list
+    print(adj_list(9,10,directed=True))
+
+    # graph: adjacency matrix
+    print(adj_mat(9,10,weighted=True,directed=True))
