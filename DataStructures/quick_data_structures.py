@@ -10,7 +10,7 @@ def vertices(n):
     return {num:index for index,num in enumerate(random.sample(range(n),k=n))}
 
 def edges(v,n,acyclic=True):
-    return [random.sample(v.keys(),k=2) if acyclic else random.choice(v.keys(),k=2) for _ in range(n)]
+    return [random.sample(v.keys(),k=2) if acyclic else random.choices(list(v.keys()),k=2) for _ in range(n)]
 
 def linked_list(n):
     head = link(-1)
@@ -46,9 +46,9 @@ def trie(words):
             current = current[nxt][ord(char)]
     return root
 
-def adj_list(v,e,directed=False):
+def adj_list(v,e,directed=False,acyclic=True):
     verts = vertices(v)
-    edgs = edges(verts,e)
+    edgs = edges(verts,e,acyclic)
     adj_list = {}
 
     frm = 0
@@ -63,11 +63,12 @@ def adj_list(v,e,directed=False):
             adj_list[pair[to]][pair[frm]] = adj_list[pair[frm]]
     return adj_list
 
-def adj_mat(v,e,directed=False,weighted=False):
+def adj_mat(v,e,directed=False,weighted=False,acyclic=True):
     verts = vertices(v)
-    edge_sets = zip(edges(verts,e), random.sample(range(e),k=e))
+    edge_sets = zip(edges(verts,e,acyclic), random.sample(range(e),k=e))
     edgs = [[edge_set[0][0],edge_set[0][1],edge_set[1]] for edge_set in edge_sets]
     adj_mat = [[0]*v for row in range(v)]
+
     frm = 0
     to = 1
 
@@ -94,9 +95,9 @@ if __name__ == '__main__':
     print(trie(["lions","tigers","bears"]))
 
     # graph: adjacency list
-    print(adj_list(9,10,directed=True))
+    print(adj_list(9,10,directed=True,acyclic=False))
 
     # graph: adjacency matrix
-    print(adj_mat(5,10,weighted=True,directed=True))
+    print(adj_mat(10,20,weighted=True,directed=True,acyclic=False))
 
     print("\npass")
