@@ -48,6 +48,7 @@ def adj_list(v,e,directed=False):
     verts = vertices(v)
     edgs = edges(verts,e)
     adj_list = {}
+
     frm = 0
     to = 1
 
@@ -69,7 +70,7 @@ def adj_mat(v,e,directed=False,weighted=False):
     to = 1
 
     for triplet in edgs:
-        for vertex in triplet:
+        for vertex in triplet[:2]:
             if vertex not in verts:
                 verts[vertex] = len(adj_mat)
                 adj_mat.append([0]*len(adj_mat))
@@ -94,4 +95,6 @@ if __name__ == '__main__':
     print(adj_list(9,10,directed=True))
 
     # graph: adjacency matrix
-    print(adj_mat(9,10,weighted=True,directed=True))
+    print(adj_mat(5,10,weighted=True,directed=True))
+
+    print("\npass")
