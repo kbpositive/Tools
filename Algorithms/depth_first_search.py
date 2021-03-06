@@ -17,17 +17,20 @@ def dfs_adj_list(graph,visited):
         print(vertex)
         dfs_adj_list(graph[vertex],visited)
 
-def dfs_mat(graph,visited,vertex):
-    if vertex not in visited:
-        visited[vertex] = True
-        print(vertex)
-        for index,data in enumerate(graph[vertex]):
-            if data != 0:
-                dfs_mat(graph,visited,index)
-
 def dfs_adj_mat(graph, visited):
     for node in range(len(graph)):
-        dfs_mat(graph,visited,node)
+        current = node
+        stack = [current]
+        while stack:
+            current = stack.pop(0)
+            if current not in visited:
+                visited[current] = True
+                print(current)
+                index = 0
+                while index < len(graph[current]) and (graph[current][index] == 0 or index in visited):
+                    index += 1
+                if index < len(graph[current]):
+                    stack.append(index)
 
 
 if __name__ == '__main__':
