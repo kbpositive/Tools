@@ -11,11 +11,16 @@ def dfs_trie(trie):
 
 def dfs_adj_list(graph,visited):
     for vertex in graph:
-        if vertex in visited:
-            continue
-        visited[vertex] = True
-        print(vertex)
-        dfs_adj_list(graph[vertex],visited)
+        if vertex not in visited:
+            stack = [vertex]
+
+            while stack:
+                current = stack.pop(0)
+                if current not in visited:
+                    visited[current] = True
+                    print(current)
+                    for node in graph[current]:
+                        stack.append(node)
 
 def dfs_adj_mat(graph, visited):
     for node in range(len(graph)):
