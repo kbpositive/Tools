@@ -1,8 +1,9 @@
 def dfs_tree(tree):
-    if tree:
-        dfs_tree(tree[1][0])
-        print(tree[0])
-        dfs_tree(tree[1][1])
+    stack = [tree]
+    while stack:
+        current = stack.pop()
+        print(current[0])
+        stack.extend([child for child in [current[1][0],current[1][1]] if child])
 
 def dfs_trie(trie):
     print(trie[0])
@@ -15,7 +16,7 @@ def dfs_adj_list(graph,visited):
             stack = [vertex]
 
             while stack:
-                current = stack.pop(0)
+                current = stack.pop()
                 if current not in visited:
                     visited[current] = True
                     print(current)
@@ -27,7 +28,7 @@ def dfs_adj_mat(graph, visited):
         current = node
         stack = [current]
         while stack:
-            current = stack.pop(0)
+            current = stack.pop()
             if current not in visited:
                 visited[current] = True
                 print(current)
