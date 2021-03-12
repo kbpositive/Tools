@@ -16,8 +16,7 @@ def dfs_trie(trie):
         current = stack.pop()
         print(current[0])
 
-        for letter in [character for character in trie[1] if character]:
-            stack.extend([letter for letter in [character for character in current[1] if character]])
+        stack.extend([character for character in current[1] if character])
 
 def dfs_adj_list(graph,visited):
     for vertex in graph:
