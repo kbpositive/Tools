@@ -4,7 +4,7 @@ def dfs_tree(tree):
     while stack:
         current = stack.pop()
 
-         if current:
+        if current:
             print(current[0])
 
             stack.extend([current[1][0],current[1][1]])
