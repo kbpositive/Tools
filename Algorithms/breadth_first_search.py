@@ -1,42 +1,46 @@
+from collections import deque
+
 def bfs_tree(tree):
-    stack = [tree]
+    queue = deque([tree])
 
-    while stack:
-        current = stack.pop(0)
-        print(current[0])
+    while queue:
+        current = queue.popleft()
 
-        stack.extend([child for child in [current[1][0],current[1][1]] if child])
+        if current:
+            print(current[0])
+
+            queue.extend([current[1][0],current[1][1]])
 
 def bfs_trie(trie):
-    stack = [trie]
+    queue = deque([trie])
 
-    while stack:
-        current = stack.pop(0)
+    while queue:
+        current = queue.popleft()
         print(current[0])
 
-        for letter in [character for character in trie[1] if character]:
-            stack.extend([letter for letter in [character for character in current[1] if character]])
+        queue.extend([character for character in current[1] if character])
 
 def bfs_adj_list(graph,visited):
     for vertex in graph:
         if vertex not in visited:
-            stack = [vertex]
+            queue = deque([vertex])
 
-            while stack:
-                current = stack.pop(0)
+            while queue:
+                current = queue.popleft()
+
                 if current not in visited:
                     visited[current] = True
                     print(current)
 
-                    for node in graph[current]:
-                        stack.append(node)
+                    queue.extend(list(graph[current]))
 
 def bfs_adj_mat(graph, visited):
     for node in range(len(graph)):
-        stack = [node]
+        queue = deque([node])
 
-        while stack:
-            current = stack.pop(0)
+        while queue:
+            current = queue.popleft()
+
             if current not in visited:
                 visited[current] = True
                 print(current)
@@ -44,8 +48,9 @@ def bfs_adj_mat(graph, visited):
                 index = 0
                 while index < len(graph[current]) and (graph[current][index] == 0 or index in visited):
                     index += 1
+
                 if index < len(graph[current]):
-                    stack.append(index)
+                    queue.append(index)
 
 
 if __name__ == '__main__':
