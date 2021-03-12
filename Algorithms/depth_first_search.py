@@ -3,9 +3,11 @@ def dfs_tree(tree):
 
     while stack:
         current = stack.pop()
-        print(current[0])
 
-        stack.extend([child for child in [current[1][0],current[1][1]] if child])
+         if current:
+            print(current[0])
+
+            stack.extend([current[1][0],current[1][1]])
 
 def dfs_trie(trie):
     stack = [trie]
