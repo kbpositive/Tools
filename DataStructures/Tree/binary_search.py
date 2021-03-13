@@ -11,20 +11,13 @@ class Tree:
         self.size = len(self.print_tree())
 
     def level_print(self):
-        if self.root is None:
-            return []
-        else:
-            output = []
-            stack = []
-            current = self.root
-            queue = [current]
-            while queue:
-                current = queue.pop(0)
+        output = []
+        queue = [self.root]
+        while queue:
+            current = queue.pop(0)
+            if current:
                 output.append(current.val)
-                if current.left:
-                    queue.append(current.left)
-                if current.right:
-                    queue.append(current.right)
+                queue.extend([i for i in [current.left,current.right] if i])
         return output
 
     def print_tree(self, order='in'):
