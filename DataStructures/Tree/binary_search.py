@@ -8,8 +8,8 @@ class Node:
 class Tree:
     def __init__(self, root=None):
         self.root = root
-        self.size = len(self.print_tree())
         self.orders = {n:True for n in ['pre','in','post']}
+        self.size = len(self.print_tree())
 
     def level_print(self):
         output = []
@@ -22,37 +22,40 @@ class Tree:
         return output
 
     def print_tree(self, order='in'):
-        # TODO: refactor
-        if self.root is None:
-            return []
-        else:
-            output = []
-            stack = []
-            current = self.root
-            if order not in orders:
-                raise Exception("Invalid search order.")
-            else:
-                while True:
-                    while current:
-                        stack.append(current)
-                        if order == 'pre':
-                            output.append(stack[-1].val)
-                        current = current.left
-                        if current is None:
-                            if order == 'in':
-                                output.append(stack[-1].val)
-                            current = stack[-1].right
-                    while stack and current == stack[-1].right:
-                        if order == 'post':
-                            output.append(stack[-1].val)
-                        current = stack.pop()
-                    if stack:
-                        if order == 'in':
-                            output.append(stack[-1].val)
-                        current = stack[-1].right
-                    else:
-                        break
-            return output
+        if order not in self.orders:
+            raise Exception("Invalid search order.")
+
+        output = []
+        stack = [self.root] if order == 'pre' else [[self.root,None]]
+        if order == 'pre':
+            while stack:
+                current = stack.pop()
+                if current:
+                    output.append(current.val)
+                    stack.extend([current.right,current.left])
+
+        elif order == 'in':
+            while stack:
+                current = stack.pop()
+                if current[1] is not None:
+                    output.append(current[1])
+                if current[0]:
+                    stack.extend([[current[0].right,current[0].val],[current[0].left,None]])
+
+        elif order == 'post':
+            while stack:
+                current = stack.pop()
+                if current[1] and current[0]:
+                    current[1].append(current[0].val)
+                    stack.extend([[current[0].right,current[1]],[current[0].left,None]])
+                else:
+                    while current[1]:
+                        output.append(current[1].pop())
+                    if current[0]:
+                        current[1] = [current[0].val]
+                        stack.extend([[current[0].right,current[1]],[current[0].left,None]])
+
+        return output
 
     def insert(self, item):
         # if tree is not empty
