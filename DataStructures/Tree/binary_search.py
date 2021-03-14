@@ -9,6 +9,7 @@ class Tree:
     def __init__(self, root=None):
         self.root = root
         self.size = len(self.print_tree())
+        self.orders = {n:True for n in ['pre','in','post']}
 
     def level_print(self):
         output = []
@@ -25,7 +26,6 @@ class Tree:
         if self.root is None:
             return []
         else:
-            orders ={n:True for n in ['pre','in','post']}
             output = []
             stack = []
             current = self.root
