@@ -18,6 +18,17 @@ class Graph:
         self.matrix[row][col] = -edge[2]
         self.matrix[col][row] = edge[2]
 
+    def print_graph(self):
+        print("",end="\t")
+        for vertex in self.vertices:
+            print(str(vertex),end="\t")
+        print("")
+        for row in self.vertices:
+            print(str(row),end="\t")
+            for col in self.vertices:
+                print(self.matrix[self.vertices[row]][self.vertices[col]],end="\t")
+            print("")
+
     @property
     def m(self):
         return len([x for y in [j[i:] for i,j in enumerate(self.matrix)] for x in y if x != 0])
@@ -40,16 +51,7 @@ if __name__ == '__main__':
 
     assert G.m == 12
     assert G.n == 7
-    def print_graph(graph):
-        print("",end="\t")
-        for vertex in graph.vertices:
-            print(str(vertex),end="\t")
-        print("")
-        for row in graph.vertices:
-            print(str(row),end="\t")
-            for col in graph.vertices:
-                print(graph.matrix[graph.vertices[row]][graph.vertices[col]],end="\t")
-            print("")
 
-    print_graph(G)
+
+    G.print_graph()
     print("pass")
