@@ -25,3 +25,6 @@ def quicksort(arr: list, left: int, right: int):
 def sort(arr: list) -> list:
     quicksort(arr, 0, len(arr) - 1)
     return arr
+
+if __name__ == '__main__':
+    import random 
