@@ -16,7 +16,12 @@ if __name__ == '__main__':
 
     arr = random.sample(range(10),k=10)
 
+    mem = arr[:]
+
     assert sort(arr) == list(range(10))
 
+    assert mem == arr
+
     assert sort_in_place(arr) == list(range(10))
-    
+
+    assert arr == list(range(10))
