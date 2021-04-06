@@ -27,4 +27,6 @@ def sort(arr: list) -> list:
     return arr
 
 if __name__ == '__main__':
-    import random 
+    assert quicksort([6,5,7,4,8,3,9,2,1],0,8) == [1,2,3,4,5,6,7,8,9]
+    pass
+    
