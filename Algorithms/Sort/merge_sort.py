@@ -22,3 +22,7 @@ def sort(arr: list) -> list:
     else:
         temp.extend(left)
     return temp
+
+if __name__ == '__main__':
+    assert sort([4,3,5,2,6,7,1]) == [1,2,3,4,5,6,7]
+    pass
