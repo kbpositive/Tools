@@ -2,7 +2,7 @@ import random
 
 def link(data): return [data, None]
 
-def node(data): return [data, {0:None, 1:None}]
+def node(data): return [data, [None, None]]
 
 def letter(data): return [data,[None]*128]
 
@@ -24,14 +24,12 @@ def linked_list(n):
 
 def tree(n):
     root = node(-1)
-    val = 0
-    nxt = 1
 
     for next_num in random.sample(range(n),k=n):
         current = root
-        while current[nxt][current[val] < next_num]:
-            current = current[nxt][current[val] < next_num]
-        current[nxt][current[val] < next_num] = node(next_num)
+        while current[1][current[0] < next_num]:
+            current = current[1][current[0] < next_num]
+        current[1][current[0] < next_num] = node(next_num)
     return root
 
 def trie(words):
