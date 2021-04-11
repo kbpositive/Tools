@@ -80,35 +80,28 @@ class Tree:
         self.update(current)
         return self.balance(current)
 
-    def remove_node(self, item, node):
-        if not node:
-            return node
-        elif node.val > item:
-            node.left = self.remove_node(item, node.left)
-        elif node.val < item:
-            node.right = self.remove_node(item, node.right)
-        else:
-            if node.left is None:
-                temp = node.right
-                node = None
-                self.size -= 1
-                return temp
-            elif node.right is None:
-                temp = node.left
-                node = None
-                self.size -= 1
-                return temp
-            temp = node.right
-            while temp.left is not None:
-                temp = temp.left
-            node.val = temp.val
-            node.right = self.remove_node(temp.val, node.right)
-            self.size -= 1
-        self.update(node)
-        return self.balance(node)
-
     def remove(self, item):
-        self.remove_node(item, self.root)
+        current = self.find(item)
+        case = bool(current.left) + bool(current.right)
+        replacement = None
+
+        if case > 1:
+            successor = current.right
+            while successor.left or successor.right:
+                successor = successor.left if successor.left else successor.right
+            current.val = successor.val
+
+            current = successor
+        elif case > 0:
+            replacement = current.left if current.left else current.right
+
+        setattr(
+            current.parent, ["left", "right"][current.parent.val < item], replacement
+        )
+
+        self.size -= 1
+        self.update(current)
+        return self.balance(current)
 
     def print_tree_pre(self):
         output = []
@@ -120,19 +113,18 @@ class Tree:
                 output.append(current.val)
         return output
 
-    def find_node(self, item, node=None):
-        if node is None:
-            raise ValueError("Item not found.")
-        elif node.val != item:
-            if item < node.val:
-                return self.find_node(item, node.left)
-            else:
-                return self.find_node(item, node.right)
-        else:
-            return node
-
     def find(self, item):
-        return self.find_node(item, self.root)
+        if self.root:
+            current = self.root
+            while [current.left, current.right][
+                current.val < item
+            ] and current.val != item:
+                current = [current.left, current.right][current.val < item]
+
+            if current.val == item:
+                return current
+
+        raise ValueError("Item not found.")
 
 
 if __name__ == "__main__":
@@ -142,4 +134,13 @@ if __name__ == "__main__":
         T.insert(val)
 
     assert T.print_tree_pre() == [5, 2, 0, 1, 4, 3, 8, 6, 7, 10, 9]
+    assert T.find(4).val == 4
+    assert T.find(5).val == 5
+
+    T.remove(4)
+    T.remove(8)
+    T.remove(7)
+
+    assert T.print_tree_pre() == [5, 2, 0, 1, 3, 9, 6, 10]
+
     print("pass")
