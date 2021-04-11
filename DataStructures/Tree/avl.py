@@ -12,33 +12,26 @@ class Tree:
     def __init__(self):
         self.root = None
         self.size = 0
-        self.func = lambda x: print(x.val)
 
     def update(self, node):
-        lh = -1
-        rh = -1
-        if node.left:
-            lh = node.left.height
-        if node.right:
-            rh = node.right.height
+        lh = node.left.height if node.left else -1
+        rh = node.right.height if node.right else -1
         node.height = 1 + max([lh, rh])
+        print(node.height)
         node.bf = rh - lh
 
-    def rotate(self, child, direction: str):
+    def rotate(self, child, direction):
         if direction == "right":
             parent = child.left
             child.left = parent.right
             parent.right = child
-            self.update(child)
-            self.update(parent)
-            return parent
         elif direction == "left":
             parent = child.right
             child.right = parent.left
             parent.left = child
-            self.update(child)
-            self.update(parent)
-            return parent
+        self.update(child)
+        self.update(parent)
+        return parent
 
     def case(self, case_type: str, node):
         if case_type == "ll":
@@ -54,15 +47,9 @@ class Tree:
 
     def balance(self, node):
         if node.bf < -1:
-            if node.left.bf <= 0:
-                return self.case("ll", node)
-            else:
-                return self.case("lr", node)
+            return self.case("ll" if node.left.bf <= 0 else "lr", node)
         elif node.bf > 1:
-            if node.right.bf >= 0:
-                return self.case("rr", node)
-            else:
-                return self.case("rl", node)
+            return self.case("rr" if node.right.bf >= 0 else "rl", node)
         return node
 
     def insert(self, item):
@@ -110,6 +97,7 @@ class Tree:
             current = stack.pop()
             if current:
                 stack.extend([current.right, current.left])
+                # print([current.height, current.bf])
                 output.append(current.val)
         return output
 
@@ -143,4 +131,8 @@ if __name__ == "__main__":
 
     assert T.print_tree_pre() == [5, 2, 0, 1, 3, 9, 6, 10]
 
+    G = Tree()
+    for val in range(25):
+        G.insert(val)
+    print(G.print_tree_pre())
     print("pass")
