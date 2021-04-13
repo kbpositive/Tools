@@ -17,7 +17,6 @@ class Tree:
         lh = node.left.height if node.left else -1
         rh = node.right.height if node.right else -1
         node.height = 1 + max([lh, rh])
-        print(node.height)
         node.bf = rh - lh
 
     def rotate(self, child, direction):
@@ -33,17 +32,20 @@ class Tree:
         self.update(parent)
         return parent
 
-    def case(self, case_type: str, node):
+    def case(self, case_type, node):
         if case_type == "ll":
             return self.rotate(node, "right")
+
         elif case_type == "lr":
             node.left = self.rotate(node.left, "left")
-            return self.case("ll", node)
+            return self.rotate(node, "right")
+
         elif case_type == "rr":
             return self.rotate(node, "left")
+
         elif case_type == "rl":
             node.right = self.rotate(node.right, "right")
-            return self.case("rr", node)
+            return self.rotate(node, "left")
 
     def balance(self, node):
         if node.bf < -1:
@@ -58,7 +60,6 @@ class Tree:
             while [current.left, current.right][current.val < item]:
                 current = [current.left, current.right][current.val < item]
             setattr(current, ["left", "right"][current.val < item], Node(current, item))
-            current = [current.left, current.right][current.val < item]
         else:
             self.root = Node(val=item)
             current = self.root
@@ -97,7 +98,6 @@ class Tree:
             current = stack.pop()
             if current:
                 stack.extend([current.right, current.left])
-                # print([current.height, current.bf])
                 output.append(current.val)
         return output
 
@@ -117,22 +117,17 @@ class Tree:
 
 if __name__ == "__main__":
     T = Tree()
-    vals = [5, 2, 4, 3, 0, 1, 8, 6, 7, 10, 9]
-    for val in vals:
-        T.insert(val)
 
-    assert T.print_tree_pre() == [5, 2, 0, 1, 4, 3, 8, 6, 7, 10, 9]
+    for val in range(10):
+        T.insert(val)
+    assert T.print_tree_pre() == [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
     assert T.find(4).val == 4
     assert T.find(5).val == 5
 
-    T.remove(4)
+    T.remove(4)  # FIX - not removed
     T.remove(8)
     T.remove(7)
 
-    assert T.print_tree_pre() == [5, 2, 0, 1, 3, 9, 6, 10]
+    assert T.print_tree_pre() == [0, 1, 2, 3, 5, 6, 9]
 
-    G = Tree()
-    for val in range(25):
-        G.insert(val)
-    print(G.print_tree_pre())
     print("pass")
