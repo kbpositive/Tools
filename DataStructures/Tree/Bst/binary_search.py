@@ -13,7 +13,7 @@ class Tree:
 
     def print_tree(self, order="in"):
         if order not in self.orders:
-            raise Exception("Invalid search order.")
+            raise ValueError("Invalid search order.")
 
         output = []
         if order == "pre" or order == "level":
@@ -159,43 +159,3 @@ class Tree:
         # otherwise, the item is not in the tree
         else:
             raise Exception("Item not in tree.")
-
-
-if __name__ == "__main__":
-    A = Tree()
-    B = Tree()
-    C = Tree()
-    D = Tree()
-    E = Tree()
-    T = Tree()
-    vals = [5, 2, 4, 3, 0, 1, 8, 6, 7, 10, 9]
-    for value in vals:
-        A.insert(value)
-        B.insert(value)
-        C.insert(value)
-        D.insert(value)
-        E.insert(value)
-        T.insert(value)
-
-    assert T.print_tree("pre") == [5, 2, 0, 1, 4, 3, 8, 6, 7, 10, 9]
-    assert T.print_tree("in") == [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
-    assert T.print_tree("post") == [1, 0, 3, 4, 2, 7, 6, 9, 10, 8, 5]
-    assert T.print_tree("level") == [5, 2, 8, 0, 4, 6, 10, 1, 3, 7, 9]
-    assert T.size == 11
-
-    A.remove(8)
-    assert A.print_tree("level") == [5, 2, 9, 0, 4, 6, 10, 1, 3, 7]
-
-    B.remove(5)
-    assert B.print_tree("level") == [6, 2, 8, 0, 4, 7, 10, 1, 3, 9]
-
-    C.remove(0)
-    assert C.print_tree("level") == [5, 2, 8, 1, 4, 6, 10, 3, 7, 9]
-
-    D.remove(10)
-    assert D.print_tree("level") == [5, 2, 8, 0, 4, 6, 9, 1, 3, 7]
-
-    E.remove(7)
-    assert E.print_tree("level") == [5, 2, 8, 0, 4, 6, 10, 1, 3, 9]
-
-    print("Pass")
