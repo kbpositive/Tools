@@ -13,6 +13,4 @@ def sort(arr):
 if __name__ == "__main__":
     import random
 
-    arr = random.sample(range(10), k=10)
-
-    assert sort(arr) == list(range(10))
+    assert sort(random.sample(range(10), k=10)) == list(range(10))
