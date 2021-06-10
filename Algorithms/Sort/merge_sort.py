@@ -1,3 +1,6 @@
+import heapq
+
+
 def sort(arr: list) -> list:
     stack = [[[], [0, len(arr) - 1]]]
     while stack:
@@ -26,21 +29,9 @@ def sort(arr: list) -> list:
         else:
             while current[0]:
                 n = current[0].pop()
-                halves = [
-                    arr[n[0] : ((n[0] + n[1]) // 2) + 1],
-                    arr[((n[0] + n[1]) // 2) + 1 : n[1] + 1],
-                ]
-
-                tmp = []
-                while halves:
-                    c = min(halves).pop(0)
-                    if c is not None:
-                        tmp.append(c)
-
-                    if min(halves) == []:
-                        halves.pop(halves.index([]))
-
-                arr[n[0] : n[1] + 1] = tmp
+                tmp = arr[n[0] : n[1] + 1]
+                heapq.heapify(tmp)
+                arr[n[0] : n[1] + 1] = [heapq.heappop(tmp) for _ in range(len(tmp))]
     return arr
 
 
@@ -48,7 +39,7 @@ if __name__ == "__main__":
     import random
 
     z = random.sample(range(20), k=20)
-
+    print(z)
     print(sort(z))
 
     assert sort(random.sample(range(8), k=8)) == [0, 1, 2, 3, 4, 5, 6, 7]
