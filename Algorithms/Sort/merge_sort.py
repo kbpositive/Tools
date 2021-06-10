@@ -1,12 +1,54 @@
 def sort(arr: list) -> list:
-    if len(arr) < 2:
-        return arr
-    middle = len(arr) // 2
-    halves = [sort(arr[:middle]),sort(arr[middle:])]
-    size = sum([len(halves[0]),len(halves[1])])
-    return [min([i for i in halves if i]).pop(0) for _ in range(size)]
+    stack = [[[], [0, len(arr) - 1]]]
+    while stack:
+        current = stack.pop()
+        if current[1][1] > current[1][0]:
+            current[0].append(current[1])
+            mean = (current[1][0] + current[1][1]) // 2
+            stack.extend(
+                [
+                    [
+                        current[0],
+                        [
+                            mean + 1,
+                            current[1][1],
+                        ],
+                    ],
+                    [
+                        [],
+                        [
+                            current[1][0],
+                            mean,
+                        ],
+                    ],
+                ]
+            )
+        else:
+            while current[0]:
+                n = current[0].pop()
+                halves = [
+                    arr[n[0] : ((n[0] + n[1]) // 2) + 1],
+                    arr[((n[0] + n[1]) // 2) + 1 : n[1] + 1],
+                ]
+
+                tmp = []
+                while halves:
+                    c = min(halves).pop(0)
+                    if c is not None:
+                        tmp.append(c)
+
+                    if min(halves) == []:
+                        halves.pop(halves.index([]))
+
+                arr[n[0] : n[1] + 1] = tmp
+    return arr
 
 
-if __name__ == '__main__':
-    assert sort([4,3,5,2,6,7,1]) == [1,2,3,4,5,6,7]
-    pass
+if __name__ == "__main__":
+    import random
+
+    z = random.sample(range(20), k=20)
+
+    print(sort(z))
+
+    assert sort(random.sample(range(8), k=8)) == [0, 1, 2, 3, 4, 5, 6, 7]
