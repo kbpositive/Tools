@@ -39,7 +39,5 @@ if __name__ == "__main__":
     import random
 
     z = random.sample(range(20), k=20)
-    print(z)
-    print(sort(z))
 
     assert sort(random.sample(range(8), k=8)) == [0, 1, 2, 3, 4, 5, 6, 7]
