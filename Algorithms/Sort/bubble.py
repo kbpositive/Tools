@@ -1,9 +1,8 @@
 def sort(arr):
     for _ in range(len(arr)):
         for indx in range(len(arr) - 1):
-            arr[indx : indx + 2] = arr[indx : indx + 2][
-                :: (-1) ** ((arr[indx] < arr[indx + 1]) + 1)
-            ]
+            if arr[indx] > arr[indx + 1]:
+                arr[indx : indx + 2] = arr[indx : indx + 2][::-1]
     return arr
 
 
