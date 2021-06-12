@@ -11,17 +11,16 @@ def partition(arr: list, pivot: int, left: int, right: int) -> int:
     return left
 
 
-def quicksort(arr: list, left: int, right: int) -> list:
-    if left < right:
-        pivot = arr[(left + right) // 2]
-        index = partition(arr, pivot, left, right)
-        quicksort(arr, left, index - 1)
-        quicksort(arr, index, right)
-    return arr
-
-
 def sort(arr: list) -> list:
-    return quicksort(arr, 0, len(arr) - 1)
+    stack = [[0, len(arr) - 1]]
+    while stack:
+        cur = stack.pop()
+
+        if cur[0] < cur[1]:
+            pivot = arr[(cur[0] + cur[1]) // 2]
+            index = partition(arr, pivot, cur[0], cur[1])
+            stack.extend([[index, cur[1]], [cur[0], index - 1]])
+    return arr
 
 
 if __name__ == "__main__":
