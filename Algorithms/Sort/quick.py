@@ -1,11 +1,10 @@
 def partition(arr: list, pivot: int, left: int, right: int) -> int:
+    nxt = lambda i, a, h, c: next(
+        i * ind for ind, val in enumerate(a, h) if c * val >= c * pivot
+    )
     while left <= right:
-        left = next(ind for ind, val in enumerate(arr[left:], left) if val >= pivot)
-        right = next(
-            -ind
-            for ind, val in enumerate(arr[: right + 1][::-1], -right)
-            if val <= pivot
-        )
+        left = nxt(1, arr[left:], left, 1)
+        right = nxt(-1, arr[: right + 1][::-1], -right, -1)
         if left <= right:
             arr[left], arr[right] = arr[right], arr[left]
             left += 1
