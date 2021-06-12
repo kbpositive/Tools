@@ -1,7 +1,6 @@
 def partition(arr: list, pivot: int, left: int, right: int) -> int:
     while left <= right:
-        while arr[left] < pivot:
-            left += 1
+        left = next(ind for ind, val in enumerate(arr[left:], left) if val >= pivot)
         while arr[right] > pivot:
             right -= 1
         if left <= right:
