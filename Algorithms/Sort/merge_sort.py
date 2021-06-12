@@ -5,26 +5,14 @@ def sort(arr: list) -> list:
     stack = [[[], [0, len(arr) - 1]]]
     while stack:
         current = stack.pop()
+
         if current[1][1] > current[1][0]:
             current[0].append(current[1])
+
             mean = (current[1][0] + current[1][1]) // 2
+
             stack.extend(
-                [
-                    [
-                        current[0],
-                        [
-                            mean + 1,
-                            current[1][1],
-                        ],
-                    ],
-                    [
-                        [],
-                        [
-                            current[1][0],
-                            mean,
-                        ],
-                    ],
-                ]
+                [[current[0], [mean + 1, current[1][1]]], [[], [current[1][0], mean]]]
             )
         else:
             while current[0]:
