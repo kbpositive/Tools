@@ -13,7 +13,7 @@ def partition(arr: list, pivot: int, left: int, right: int) -> int:
     return left
 
 
-def quicksort(arr: list, left: int, right: int):
+def quicksort(arr: list, left: int, right: int) -> list:
     if left < right:
         pivot = arr[(left + right) // 2]
         index = partition(arr, pivot, left, right)
@@ -23,10 +23,8 @@ def quicksort(arr: list, left: int, right: int):
 
 
 def sort(arr: list) -> list:
-    quicksort(arr, 0, len(arr) - 1)
-    return arr
+    return quicksort(arr, 0, len(arr) - 1)
 
-if __name__ == '__main__':
-    assert quicksort([6,5,7,4,8,3,9,2,1],0,8) == [1,2,3,4,5,6,7,8,9]
-    pass
-    
+
+if __name__ == "__main__":
+    assert sort([6, 5, 7, 4, 8, 3, 9, 2, 1]) == [1, 2, 3, 4, 5, 6, 7, 8, 9]
