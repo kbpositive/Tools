@@ -5,9 +5,7 @@ def partition(arr: list, pivot: int, left: int, right: int) -> int:
         while arr[right] > pivot:
             right -= 1
         if left <= right:
-            temp = arr[left]
-            arr[left] = arr[right]
-            arr[right] = temp
+            arr[left], arr[right] = arr[right], arr[left]
             left += 1
             right -= 1
     return left
