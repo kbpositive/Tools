@@ -1,4 +1,4 @@
-import heapq
+from collections import deque
 
 
 def sort(arr: list) -> list:
@@ -18,9 +18,8 @@ def sort(arr: list) -> list:
 
         while current[0]:
             n = current[0].pop()
-            tmp = arr[n[0] : n[1] + 1]
-            heapq.heapify(tmp)
-            arr[n[0] : n[1] + 1] = [heapq.heappop(tmp) for _ in range(len(tmp))]
+            tmp = [deque(arr[n[0] : n[1] + 1]), deque(arr[n[1] + 1 :])]
+            arr[n[0] : n[1] + 1] = [max(tmp).popleft() for _ in range(n[1] - n[0] + 1)]
 
     return arr
 
@@ -28,4 +27,5 @@ def sort(arr: list) -> list:
 if __name__ == "__main__":
     import random
 
+    print(sort(random.sample(range(20), k=20)))
     assert sort(random.sample(range(20), k=20)) == [i for i in range(20)]
