@@ -3,6 +3,7 @@ import heapq
 
 def sort(arr: list) -> list:
     stack = [[[], [0, len(arr) - 1]]]
+
     while stack:
         current = stack.pop()
 
@@ -14,12 +15,14 @@ def sort(arr: list) -> list:
             stack.extend(
                 [[current[0], [mean + 1, current[1][1]]], [[], [current[1][0], mean]]]
             )
-        else:
-            while current[0]:
-                n = current[0].pop()
-                tmp = arr[n[0] : n[1] + 1]
-                heapq.heapify(tmp)
-                arr[n[0] : n[1] + 1] = [heapq.heappop(tmp) for _ in range(len(tmp))]
+            continue
+
+        while current[0]:
+            n = current[0].pop()
+            tmp = arr[n[0] : n[1] + 1]
+            heapq.heapify(tmp)
+            arr[n[0] : n[1] + 1] = [heapq.heappop(tmp) for _ in range(len(tmp))]
+
     return arr
 
 
