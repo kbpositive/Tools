@@ -12,9 +12,8 @@ def sort(arr: list) -> list:
 
             mean = sum(current[1]) // 2
 
-            stack.extend(
-                [[current[0], [mean + 1, current[1][1]]], [[], [current[1][0], mean]]]
-            )
+            stack.append([current[0], [mean + 1, current[1][1]]])
+            stack.append([[], [current[1][0], mean]])
             continue
 
         while current[0]:
