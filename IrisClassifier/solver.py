@@ -53,6 +53,6 @@ model.fit(
     y,
     batch_size=64,
     epochs=400,
-    shuffle=True,
     validation_data=(a, b),
 )
+# loss: ~0.0533 - categorical_accuracy: ~0.9455 - val_loss: ~0.0578 - val_categorical_accuracy: ~0.9500
