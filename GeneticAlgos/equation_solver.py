@@ -64,12 +64,15 @@ def fitness(organism, target):
     return fit
 
 
-random_organism = "".join(random.choices(list(genome), k=10))
-print(
-    max(
-        [
-            fitness("".join(random.choices(list(genome), k=10)), 429.7)
-            for _ in range(5000)
-        ]
-    )
-)
+def orgSeed(numGenes):
+    organism = []
+    chromosome = random.choices([0.0, 1.0], k=5 * numGenes)
+    for c in range(len(chromosome) // 5):
+        for key, (value, gene) in genome.items():
+            if gene == chromosome[c * 5 : (c + 1) * 5]:
+                organism.append(key)
+                continue
+    return "".join(organism)
+
+
+print(orgSeed(7))
