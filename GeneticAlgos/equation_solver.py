@@ -22,8 +22,8 @@ genome = {
 
 def orgEval(organism):
     if (
-        not type(genome[organism[0]][0]) == type(genome[organism[-1]][0]) == float
-        or organism == ""
+        organism == ""
+        or not type(genome[organism[0]][0]) == type(genome[organism[-1]][0]) == float
     ):
         return None
     opers = [0.0, []]
@@ -67,9 +67,8 @@ def fitness(organism, target):
     return fit
 
 
-def orgSeed(numGenes):
+def orgCreate(chromosome):
     organism = []
-    chromosome = random.choices([0.0, 1.0], k=5 * numGenes)
     for c in range(len(chromosome) // 5):
         for key, (value, gene) in genome.items():
             if gene == chromosome[c * 5 : (c + 1) * 5]:
@@ -78,6 +77,39 @@ def orgSeed(numGenes):
     return "".join(organism)
 
 
-target = 42
+def orgSeed(numGenes):
+    chromosome = random.choices([0.0, 1.0], k=5 * numGenes)
+    return orgCreate(chromosome), chromosome
 
-print(fitness(orgSeed(7), target))
+
+def mutate(chromosome):
+    for _ in range(len(chromosome) // 5):
+        mutation = random.choice(range(len(chromosome)))
+        chromosome[mutation] = random.choice([0.0, 1.0])
+    return chromosome
+
+
+def generateOffspring(chromosome, num):
+    return [
+        [orgCreate(mutate(chromosome[:])), mutate(chromosome[:])] for _ in range(num)
+    ]
+
+
+def prune(offspring, num, target):
+    return sorted(
+        [[fitness(child, target), child, c] for child, c in offspring], reverse=True
+    )[:num]
+
+
+target = 42
+organism, chromosome = orgSeed(14)
+offspring = generateOffspring(chromosome, 50)
+print(fitness(organism, target), organism)
+print(prune(offspring, 1, target)[0][:2])
+
+for _ in range(100):
+    o = generateOffspring(prune(offspring, 1, target)[0][2], 50)
+    p = prune(o, 1, target)[0][:2]
+    print(p)
+    if p[0] >= 10:
+        break
