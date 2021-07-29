@@ -1,5 +1,6 @@
 import operator
 import random
+import math
 
 genome = {
     "0": [0.0, [0.0, 0.0, 0.0, 0.0, 0.0]],
@@ -20,9 +21,11 @@ genome = {
 
 
 def orgEval(organism):
+    if not type(genome[organism[0]][0]) == type(genome[organism[-1]][0]) == float:
+        return None
     opers = [0.0, []]
     sign = None
-    for char in organism:
+    for index, char in enumerate(organism):
         if type(genome[char][0]) != float:
             if not opers[1]:
                 continue
@@ -31,14 +34,42 @@ def orgEval(organism):
                 opers[0] = float("".join(opers[1]))
                 opers[1] = []
                 continue
-            opers[0] = sign(opers[0], float("".join(opers[1])))
+            elif type(genome[organism[index - 1]][0]) != float:
+                return None
+            opers[0] = (
+                sign(opers[0], float("".join(opers[1])))
+                if float("".join(opers[1])) != 0.0
+                else 0.0
+            )
             opers[1] = []
             sign = genome[char][0]
         else:
             opers[1].append(char)
-    if opers[1]:
-        opers[0] = sign(opers[0], float("".join(opers[1])))
-    return opers[0]
+    if opers[1] and sign:
+        opers[0] = (
+            sign(opers[0], float("".join(opers[1])))
+            if float("".join(opers[1])) != 0.0
+            else 0.0
+        )
+        return opers[0]
+    return None
 
 
-orgEval("/2+32/7-")
+def fitness(organism, target):
+    fit = 10.0
+    if orgEval(organism) is None:
+        fit -= 10.0
+    else:
+        fit -= math.log(1 + abs(target - orgEval(organism))) / 3
+    return fit
+
+
+random_organism = "".join(random.choices(list(genome), k=10))
+print(
+    max(
+        [
+            fitness("".join(random.choices(list(genome), k=10)), 429.7)
+            for _ in range(5000)
+        ]
+    )
+)
