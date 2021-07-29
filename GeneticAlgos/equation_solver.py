@@ -31,6 +31,8 @@ def orgEval(organism):
     for index, char in enumerate(organism):
         if type(genome[char][0]) != float:
             if not opers[1]:
+                if sign:
+                    return None
                 continue
             elif not sign:
                 sign = genome[char][0]
