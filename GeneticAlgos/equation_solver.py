@@ -21,7 +21,10 @@ genome = {
 
 
 def orgEval(organism):
-    if not type(genome[organism[0]][0]) == type(genome[organism[-1]][0]) == float:
+    if (
+        not type(genome[organism[0]][0]) == type(genome[organism[-1]][0]) == float
+        or organism == ""
+    ):
         return None
     opers = [0.0, []]
     sign = None
@@ -75,4 +78,6 @@ def orgSeed(numGenes):
     return "".join(organism)
 
 
-print(orgSeed(7))
+target = 42
+
+print(fitness(orgSeed(7), target))
