@@ -18,8 +18,16 @@ def sort(arr: list) -> list:
 
         while current[0]:
             n = current[0].pop()
-            tmp = [deque(arr[n[0] : n[1] + 1]), deque(arr[n[1] + 1 :])]
-            arr[n[0] : n[1] + 1] = [max(tmp).popleft() for _ in range(n[1] - n[0] + 1)]
+            tmp = [
+                deque(arr[n[0] : ((n[1] + n[0]) // 2) + 1]),
+                deque(arr[((n[1] + n[0]) // 2) + 1 : n[1] + 1]),
+            ]
+            result = []
+            while min(tmp):
+                result.append(min(tmp).popleft())
+            else:
+                result.extend(max(tmp))
+            arr[n[0] : n[1] + 1] = result
 
     return arr
 
