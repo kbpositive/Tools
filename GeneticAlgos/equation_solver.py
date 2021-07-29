@@ -19,10 +19,6 @@ genome = {
 }
 
 
-def opEval(op1, oper, op2):
-    return genome[oper][0](float(op1), float(op2))
-
-
 def orgEval(organism):
     opers = [0.0, []]
     sign = None
