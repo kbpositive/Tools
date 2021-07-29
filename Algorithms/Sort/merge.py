@@ -35,5 +35,4 @@ def sort(arr: list) -> list:
 if __name__ == "__main__":
     import random
 
-    print(sort(random.sample(range(20), k=20)))
     assert sort(random.sample(range(20), k=20)) == [i for i in range(20)]
