@@ -1,11 +1,3 @@
-def nxt(invert, arr, side, pivot):
-    return next(
-        invert * ind
-        for ind, val in enumerate(arr[::invert], invert * side)
-        if invert * val >= invert * pivot
-    )
-
-
 def sort(arr: list) -> list:
     stack = [[0, len(arr) - 1]]
     while stack:
@@ -15,8 +7,14 @@ def sort(arr: list) -> list:
             left, right, pivot = cur[0], cur[1], arr[(cur[0] + cur[1]) // 2]
 
             while left <= right:
-                left = nxt(1, arr[left:], left, pivot)
-                right = nxt(-1, arr[: right + 1], right, pivot)
+                left = next(
+                    ind for ind, val in enumerate(arr[left:], left) if val >= pivot
+                )
+                right = next(
+                    -ind
+                    for ind, val in enumerate(arr[: right + 1][::-1], -right)
+                    if -val >= -pivot
+                )
                 if left <= right:
                     arr[left], arr[right] = arr[right], arr[left]
                     left += 1
