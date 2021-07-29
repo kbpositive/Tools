@@ -13,15 +13,14 @@ def sort(arr: list) -> list:
                 right = next(
                     -ind
                     for ind, val in enumerate(arr[: right + 1][::-1], -right)
-                    if -val >= -pivot
+                    if val <= pivot
                 )
                 if left <= right:
                     arr[left], arr[right] = arr[right], arr[left]
                     left += 1
                     right -= 1
 
-            index = left
-            stack.extend([[index, cur[1]], [cur[0], index - 1]])
+            stack.extend([[left, cur[1]], [cur[0], left - 1]])
     return arr
 
 
