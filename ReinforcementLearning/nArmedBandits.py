@@ -15,7 +15,7 @@ class bandit:
         self.model = models.Sequential(
             [layers.Dense(arms, input_shape=(arms,), activation="sigmoid")]
         )
-        self.optimizer = optimizers.Adam(learning_rate=0.001)
+        self.optimizer = optimizers.Adam(learning_rate=0.01)
         self.model.compile(
             loss=self.reinforce, optimizer=self.optimizer, metrics="MeanAbsoluteError"
         )
@@ -40,8 +40,8 @@ if __name__ == "__main__":
     for epoch in range(100):
         con.model.fit(
             np.array([con.state]),
-            np.array([np.mean([con.pull() for _ in range(10)], axis=0)]),
-            epochs=10,
+            np.array([np.mean([con.pull() for _ in range(1000)], axis=0)]),
+            epochs=1,
             verbose=0,
         )
         result.append(
