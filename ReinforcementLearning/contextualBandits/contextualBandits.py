@@ -42,7 +42,7 @@ if __name__ == "__main__":
     result = []
     files = []
 
-    for epoch in range(100):
+    for epoch in range(10):
         con.model.fit(
             con.state,
             np.mean(
@@ -54,7 +54,18 @@ if __name__ == "__main__":
         )
         result.append(np.mean(con.model.predict(con.state) - con.actions, axis=0))
         fig, axs = plt.subplots(ncols=2)
-        sns.lineplot(data=result, color="#8FCACA", ax=axs[0])
+        sns.lineplot(
+            data=np.array(result),
+            palette={0: "#8FCACA", 1: "#FFAEA5", 2: "#FED73C", 3: "#F6EAC2"},
+            dashes={0: "", 1: "", 2: "", 3: ""},
+            ax=axs[0],
+        )
+        sns.lineplot(
+            data=np.array(result)[-1],
+            palette={0: "#8FCACA", 1: "#FFAEA5", 2: "#FED73C", 3: "#F6EAC2"},
+            dashes={0: "", 1: "", 2: "", 3: ""},
+            ax=axs[1],
+        )
 
         files.append(f"./results/{epoch}.png")
         plt.savefig(files[-1])
@@ -63,7 +74,7 @@ if __name__ == "__main__":
         for file in files:
             image = imageio.imread(file)
             writer.append_data(image)
-        for _ in range(10):
+        for _ in range(36):
             image = imageio.imread(files[-1])
             writer.append_data(image)
 
