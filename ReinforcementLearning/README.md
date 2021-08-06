@@ -1,1 +1,1 @@
-![](./results.png?raw=true)
+![](./results.gif?raw=true)
