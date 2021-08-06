@@ -10,18 +10,20 @@ from IPython import display
 class bandit:
     def __init__(self, arms):
         self.arms = arms
-        self.actions = np.random.uniform(-1.0, 1.0, arms)
+        self.actions = np.random.uniform(0.0, 1.0, arms)
         self.state = np.ones(arms)
         self.model = models.Sequential(
-            [layers.Dense(arms, input_shape=(arms,), activation="tanh")]
+            [layers.Dense(arms, input_shape=(arms,), activation="sigmoid")]
         )
-        self.optimizer = optimizers.Adam(learning_rate=0.025)
-        self.model.compile(loss=self.reinforce, optimizer=self.optimizer)
+        self.optimizer = optimizers.Adam(learning_rate=0.001)
+        self.model.compile(
+            loss=self.reinforce, optimizer=self.optimizer, metrics="MeanAbsoluteError"
+        )
 
     def pull(self):
         return np.array(
             [
-                (-1.0) ** int(action > np.random.uniform(-1.0, 1.0))
+                (0.0) ** int(action < np.random.uniform(0.0, 1.0))
                 for action in self.actions
             ]
         )
@@ -36,4 +38,14 @@ if __name__ == "__main__":
     result = []
 
     for epoch in range(100):
-        continue
+        con.model.fit(
+            np.array([con.state]),
+            np.array([np.mean([con.pull() for _ in range(10)], axis=0)]),
+            epochs=10,
+            verbose=0,
+        )
+        result.append(
+            np.mean(con.model.predict(np.array([con.state]))[0] - con.actions)
+        )
+    sns.lineplot(data=result)
+    plt.savefig("./results.png")
