@@ -18,7 +18,7 @@ class bandit:
         self.model = models.Sequential(
             [layers.Dense(arms, input_shape=(arms,), activation="sigmoid")]
         )
-        self.optimizer = optimizers.Adam(learning_rate=0.01)
+        self.optimizer = optimizers.Adam(learning_rate=0.015)
         self.model.compile(
             loss=self.reinforce, optimizer=self.optimizer, metrics="MeanAbsoluteError"
         )
@@ -42,7 +42,7 @@ if __name__ == "__main__":
     result = []
     files = []
 
-    for epoch in range(10):
+    for epoch in range(100):
         con.model.fit(
             con.state,
             np.mean(
@@ -56,19 +56,31 @@ if __name__ == "__main__":
         fig, axs = plt.subplots(ncols=2)
         sns.lineplot(
             data=np.array(result),
-            palette={0: "#8FCACA", 1: "#FFAEA5", 2: "#FED73C", 3: "#F6EAC2"},
+            palette={0: "#8FCACA", 1: "#8FCACA", 2: "#8FCACA", 3: "#8FCACA"},
             dashes={0: "", 1: "", 2: "", 3: ""},
             ax=axs[0],
         )
         sns.lineplot(
-            data=np.array(result)[-1],
-            palette={0: "#8FCACA", 1: "#FFAEA5", 2: "#FED73C", 3: "#F6EAC2"},
-            dashes={0: "", 1: "", 2: "", 3: ""},
+            data=np.transpose(
+                np.append(con.model.predict(con.state), con.actions, axis=0)
+            ),
+            palette={
+                0: "#8FCACA",
+                1: "#8FCACA",
+                2: "#8FCACA",
+                3: "#8FCACA",
+                4: "#FFAEA5",
+                5: "#FFAEA5",
+                6: "#FFAEA5",
+                7: "#FFAEA5",
+            },
+            dashes={0: "", 1: "", 2: "", 3: "", 4: "", 5: "", 6: "", 7: ""},
             ax=axs[1],
         )
 
         files.append(f"./results/{epoch}.png")
         plt.savefig(files[-1])
+        plt.close()
 
     with imageio.get_writer("./results.gif", mode="I") as writer:
         for file in files:
