@@ -19,3 +19,14 @@ class bandit:
                 for action in self.actions
             ]
         )
+
+
+if __name__ == "__main__":
+    arms = 4
+    con = bandit(arms)
+
+    agent = models.Sequential(
+        [layers.Dense(arms, input_shape=(arms,), activation="tanh")]
+    )
+
+    optimizer = optimizers.Adam(learning_rate=0.025)
