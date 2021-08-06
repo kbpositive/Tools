@@ -85,7 +85,7 @@ def orgSeed(numGenes):
 
 
 def mutate(chromosome):
-    for _ in range(25):
+    for _ in range(mutationRate):
         mutation = random.choice(range(len(chromosome)))
         chromosome[mutation] = random.choice([0.0, 1.0])
     return chromosome
@@ -103,10 +103,11 @@ def prune(offspring, num, target):
     )[:num]
 
 
-target = 42.75
-chromosomeLength = 20
+target = 7919
+chromosomeLength = 8
 growthRate = 100
-acceptanceRate = 10
+acceptanceRate = 5
+mutationRate = 4
 
 organism, chromosome = orgSeed(chromosomeLength)
 offspring = generateOffspring(chromosome, growthRate)
