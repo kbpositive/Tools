@@ -3,6 +3,8 @@ from tensorflow.keras import models, layers, optimizers
 import numpy as np
 import seaborn as sns
 import matplotlib.pyplot as plt
+import imageio
+import os
 
 
 class bandit:
@@ -34,6 +36,7 @@ if __name__ == "__main__":
     arms = 4
     con = bandit(arms)
     result = []
+    files = []
 
     for epoch in range(100):
         con.model.fit(
@@ -45,5 +48,17 @@ if __name__ == "__main__":
         result.append(
             np.mean(con.model.predict(np.array([con.state]))[0] - con.actions)
         )
-    sns.lineplot(data=result)
-    plt.savefig("./results.png")
+        sns.lineplot(data=result, color="#8FCACA")
+        files.append(f"./results/{epoch}.png")
+        plt.savefig(files[-1])
+
+    with imageio.get_writer("./results.gif", mode="I") as writer:
+        for file in files:
+            image = imageio.imread(file)
+            writer.append_data(image)
+        for _ in range(10):
+            image = imageio.imread(files[-1])
+            writer.append_data(image)
+
+    for file in set(files):
+        os.remove(file)
