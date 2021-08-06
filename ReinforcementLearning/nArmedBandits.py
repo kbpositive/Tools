@@ -48,7 +48,13 @@ if __name__ == "__main__":
         result.append(
             np.mean(con.model.predict(np.array([con.state]))[0] - con.actions)
         )
-        sns.lineplot(data=result, color="#8FCACA")
+        fig, axs = plt.subplots(ncols=2)
+        sns.lineplot(data=result, color="#8FCACA", ax=axs[0])
+        sns.lineplot(
+            data=[con.model.predict(np.array([con.state]))[0], con.actions],
+            palette={0: "#8FCACA", 1: "#FFAEA5"},
+            ax=axs[1],
+        )
         files.append(f"./results/{epoch}.png")
         plt.savefig(files[-1])
 
