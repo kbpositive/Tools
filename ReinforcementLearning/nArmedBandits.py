@@ -15,7 +15,7 @@ class bandit:
     def pull(self):
         return np.array(
             [
-                -(1.0 ** int(action > np.random.uniform(-1.0, 1.0)))
+                (-1.0) ** int(action > np.random.uniform(-1.0, 1.0))
                 for action in self.actions
             ]
         )
