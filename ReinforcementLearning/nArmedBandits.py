@@ -1,10 +1,8 @@
 import tensorflow as tf
 from tensorflow.keras import models, layers, optimizers
-import tensorflow.keras.backend as kb
 import numpy as np
 import seaborn as sns
 import matplotlib.pyplot as plt
-from IPython import display
 
 
 class bandit:
