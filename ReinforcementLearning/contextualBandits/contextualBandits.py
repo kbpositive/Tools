@@ -42,7 +42,7 @@ if __name__ == "__main__":
     result = []
     files = []
 
-    for epoch in range(100):
+    for epoch in range(300):
         con.model.fit(
             con.state,
             np.mean(
@@ -56,7 +56,7 @@ if __name__ == "__main__":
         fig, axs = plt.subplots(ncols=2)
         sns.lineplot(
             data=np.array(result),
-            palette={0: "#8FCACA", 1: "#8FCACA", 2: "#8FCACA", 3: "#8FCACA"},
+            palette={0: "#8FCACA", 1: "#9FCACA", 2: "#AFCACA", 3: "#BFCACA"},
             dashes={0: "", 1: "", 2: "", 3: ""},
             ax=axs[0],
         )
@@ -66,13 +66,13 @@ if __name__ == "__main__":
             ),
             palette={
                 0: "#8FCACA",
-                1: "#8FCACA",
-                2: "#8FCACA",
-                3: "#8FCACA",
-                4: "#FFAEA5",
-                5: "#FFAEA5",
-                6: "#FFAEA5",
-                7: "#FFAEA5",
+                1: "#9FCACA",
+                2: "#AFCACA",
+                3: "#BFCACA",
+                4: "#FFBEB5",
+                5: "#FFCEC5",
+                6: "#FFDED5",
+                7: "#FFEEE5",
             },
             dashes={0: "", 1: "", 2: "", 3: "", 4: "", 5: "", 6: "", 7: ""},
             ax=axs[1],
