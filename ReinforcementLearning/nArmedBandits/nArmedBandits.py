@@ -53,6 +53,7 @@ if __name__ == "__main__":
         sns.lineplot(
             data=[con.model.predict(np.array([con.state]))[0], con.actions],
             palette={0: "#8FCACA", 1: "#FFAEA5"},
+            dashes={0: "", 1: ""},
             ax=axs[1],
         )
         files.append(f"./results/{epoch}.png")
@@ -62,7 +63,7 @@ if __name__ == "__main__":
         for file in files:
             image = imageio.imread(file)
             writer.append_data(image)
-        for _ in range(10):
+        for _ in range(36):
             image = imageio.imread(files[-1])
             writer.append_data(image)
 
