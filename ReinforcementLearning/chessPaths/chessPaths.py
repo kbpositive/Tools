@@ -11,6 +11,9 @@ class Board:
     def __init__(self, rewards):
         self.rewards = rewards
 
+    def state(self, pos):
+        return pos - (np.array([len(self.rewards), len(self.rewards[0])]) / 2.0)
+
     def reward(self, pos):
         return self.rewards[pos[0]][pos[1]]
 
@@ -19,8 +22,8 @@ class Piece:
     def __init__(self, pos):
         self.pos = pos
 
-    def state(self, board):
-        return self.pos - (np.array([len(board.rewards), len(board.rewards[0])]) / 2.0)
+    def reinforce(self, actual, pred):
+        return pred - actual * tf.math.log(pred)
 
 
 class King(Piece):
@@ -36,6 +39,14 @@ class King(Piece):
             7: np.array([1, 0]),
             8: np.array([1, 1]),
         }
+
+        self.model = models.Sequential(
+            [layers.Dense(len(self.moves), input_shape=(2,), activation="softmax")]
+        )
+        self.optimizer = optimizers.Adam(learning_rate=0.015)
+        self.model.compile(
+            loss=self.reinforce, optimizer=self.optimizer, metrics="MeanAbsoluteError"
+        )
         super(King, self).__init__(rewards)
 
 
