@@ -7,14 +7,30 @@ import imageio
 import os
 
 
-class board:
+class Piece:
+    def __init__(self, row, col, board):
+        self.pos = row, col
+        self.rewards = board
+
+    def state(self):
+        return self.pos[0] - (len(self.rewards) / 2.0), self.pos[1] - (
+            len(self.rewards[0]) / 2.0
+        )
+
+    def reward(self):
+        return self.rewards[self.pos[0]][self.pos[1]]
+
+
+class King(Piece):
     pass
 
 
-class piece:
-    def __init__(self, pos):
-        self.pos = pos
-
-
-class king(piece):
+class Knight(Piece):
     pass
+
+
+r = np.zeros((8, 8))
+k = King(0, 0, r)
+
+print(k.state())
+print(k.reward())
