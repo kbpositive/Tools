@@ -6,6 +6,8 @@ import matplotlib.pyplot as plt
 import imageio
 import os
 
+from tensorflow.python.keras.callbacks import History
+
 
 class bandit:
     def __init__(self, arms):
@@ -13,11 +15,13 @@ class bandit:
         self.actions = np.random.uniform(0.0, 1.0, arms)
         self.state = np.ones(arms)
         self.model = models.Sequential(
-            [layers.Dense(arms, input_shape=(arms,), activation="sigmoid")]
+            [layers.Dense(arms, input_shape=(arms,), activation="softmax")]
         )
-        self.optimizer = optimizers.Adam(learning_rate=0.01)
+        self.optimizer = optimizers.Adam(learning_rate=0.005)
         self.model.compile(
-            loss=self.reinforce, optimizer=self.optimizer, metrics="MeanAbsoluteError"
+            loss=self.reinforce,
+            optimizer=self.optimizer,
+            metrics=tf.keras.metrics.MeanAbsoluteError(),
         )
 
     def pull(self):
@@ -39,27 +43,32 @@ if __name__ == "__main__":
     files = []
 
     for epoch in range(100):
-        con.model.fit(
+        history = con.model.fit(
             np.array([con.state]),
-            np.array([np.mean([con.pull() for _ in range(1000)], axis=0)]),
+            tf.nn.softmax(
+                np.array([np.mean([con.pull() for _ in range(500)], axis=0)])
+            ),
             epochs=1,
             verbose=0,
         )
-        result.append(
-            np.mean(con.model.predict(np.array([con.state]))[0] - con.actions)
-        )
+
+        result.extend(history.history[[i for i in history.history.keys()][-1]])
         fig, axs = plt.subplots(ncols=2)
         sns.lineplot(data=result, color="#8FCACA", ax=axs[0])
         sns.lineplot(
-            data=[con.model.predict(np.array([con.state]))[0], con.actions],
+            data=[
+                con.model.predict(np.array([con.state]))[0],
+                tf.nn.softmax(con.actions),
+            ],
             palette={0: "#8FCACA", 1: "#FFAEA5"},
             dashes={0: "", 1: ""},
             ax=axs[1],
         )
-        files.append(f"./results/{epoch}.png")
+        files.append(f"./nArmedBandits/results/{epoch}.png")
         plt.savefig(files[-1])
+        plt.close()
 
-    with imageio.get_writer("./results.gif", mode="I") as writer:
+    with imageio.get_writer("./nArmedBandits/results.gif", mode="I") as writer:
         for file in files:
             image = imageio.imread(file)
             writer.append_data(image)
