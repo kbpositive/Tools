@@ -16,11 +16,13 @@ class bandit:
         )
         self.state = np.eye(context)
         self.model = models.Sequential(
-            [layers.Dense(arms, input_shape=(arms,), activation="sigmoid")]
+            [layers.Dense(arms, input_shape=(arms,), activation="softmax")]
         )
-        self.optimizer = optimizers.Adam(learning_rate=0.015)
+        self.optimizer = optimizers.Adam(learning_rate=0.008)
         self.model.compile(
-            loss=self.reinforce, optimizer=self.optimizer, metrics="MeanAbsoluteError"
+            loss=self.reinforce,
+            optimizer=self.optimizer,
+            metrics=tf.keras.metrics.MeanAbsoluteError(),
         )
 
     def pull(self, state):
@@ -42,17 +44,26 @@ if __name__ == "__main__":
     result = []
     files = []
 
-    for epoch in range(300):
-        con.model.fit(
+    for epoch in range(200):
+        history = con.model.fit(
             con.state,
-            np.mean(
-                [[con.pull(i) for i in range(len(con.actions))] for _ in range(1000)],
-                axis=0,
+            np.array(
+                [
+                    tf.nn.softmax(i)
+                    for i in np.mean(
+                        [
+                            [con.pull(i) for i in range(len(con.actions))]
+                            for _ in range(500)
+                        ],
+                        axis=0,
+                    )
+                ]
             ),
             epochs=1,
             verbose=0,
         )
-        result.append(np.mean(con.model.predict(con.state) - con.actions, axis=0))
+
+        result.append(history.history[[i for i in history.history.keys()][-1]])
         fig, axs = plt.subplots(ncols=2)
         sns.lineplot(
             data=np.array(result),
@@ -62,7 +73,11 @@ if __name__ == "__main__":
         )
         sns.lineplot(
             data=np.transpose(
-                np.append(con.model.predict(con.state), con.actions, axis=0)
+                np.append(
+                    con.model.predict(con.state),
+                    [tf.nn.softmax(i) for i in con.actions],
+                    axis=0,
+                )
             ),
             palette={
                 0: "#8FCACA",
@@ -78,11 +93,11 @@ if __name__ == "__main__":
             ax=axs[1],
         )
 
-        files.append(f"./results/{epoch}.png")
+        files.append(f"./contextualBandits/results/{epoch}.png")
         plt.savefig(files[-1])
         plt.close()
 
-    with imageio.get_writer("./results.gif", mode="I") as writer:
+    with imageio.get_writer("./contextualBandits/results.gif", mode="I") as writer:
         for file in files:
             image = imageio.imread(file)
             writer.append_data(image)
