@@ -3,6 +3,7 @@ from tensorflow.keras import models, layers, optimizers
 import numpy as np
 import seaborn as sns
 import matplotlib.pyplot as plt
+from matplotlib.colors import LogNorm
 import imageio
 import os
 
@@ -13,7 +14,7 @@ class Board:
         self.dims = np.array([len(self.rewards), len(self.rewards[0])])
 
     def state(self, pos):
-        return pos - (np.array([len(self.rewards), len(self.rewards[0])]) / 2.0)
+        return np.eye(64)[(pos[0] * 8) + pos[1]]
 
     def reward(self, pos):
         return self.rewards[pos[0]][pos[1]]
@@ -42,9 +43,9 @@ class King(Piece):
         }
 
         self.model = models.Sequential(
-            [layers.Dense(len(self.moves), input_shape=(2,), activation="softmax")]
+            [layers.Dense(len(self.moves), input_shape=(64,), activation="sigmoid")]
         )
-        self.optimizer = optimizers.Adam(learning_rate=0.008)
+        self.optimizer = optimizers.Adam(learning_rate=0.04)
         self.model.compile(
             loss=self.reinforce,
             optimizer=self.optimizer,
@@ -58,55 +59,97 @@ class Knight(Piece):
 
 
 if __name__ == "__main__":
-    r = Board(np.zeros((8, 8)) + 0.5)
+    k = King(np.array([0, 0]))
+
+    r = Board(np.zeros((8, 8)) + (1.0 / len(k.moves)))
     r.rewards[-1][0] = 1.0
     r.rewards[0][-1] = 1.0
     r.rewards[0][0] = 0.0
     r.rewards[-1][-1] = 0.0
+    r.rewards[3][3] = 1.0
+    r.rewards[4][4] = 1.0
+    r.rewards[3][4] = 0.0
+    r.rewards[4][3] = 0.0
 
-    k = King(np.array([0, 0]))
-
-    inputs = np.array([r.state(k.pos)])
-    outputs = np.array(
+    inp = np.array(
         [
-            [
-                r.reward(k.pos + move)
-                if min(r.dims - np.absolute(k.pos + move)) > 0
-                else r.reward(k.pos)
-                for move in k.moves.values()
-            ]
+            r.state(np.array([row, col]))
+            for row in range(r.dims[0])
+            for col in range(r.dims[1])
         ]
     )
-
+    out = np.array(
+        [
+            tf.nn.softmax(
+                [
+                    r.reward(np.array([row, col]) + move)
+                    if (
+                        0 <= (np.array([row, col]) + move)[0] < r.dims[0]
+                        and 0 <= (np.array([row, col]) + move)[1] < r.dims[1]
+                    )
+                    else r.reward(np.array([row, col]))
+                    for move in k.moves.values()
+                ]
+            )
+            for row in range(r.dims[0])
+            for col in range(r.dims[1])
+        ]
+    )
     result = []
     files = []
-    for epoch in range(10):
+    for epoch in range(200):
         history = k.model.fit(
-            inputs,
-            outputs,
+            inp,
+            out,
             epochs=1,
+            batch_size=64,
             verbose=0,
         )
 
         result.append(history.history[[i for i in history.history.keys()][-1]])
-        fig, axs = plt.subplots(ncols=2)
+        sns.set(rc={"figure.figsize": (20, 7)})
+        fig, axs = plt.subplots(ncols=3)
+        mainColor = 0x8FCACA
+        colorWeight = 0x0A0A0A
         sns.lineplot(
             data=np.array(result),
-            color={0: "#8FCACA"},
+            color={0: f"#{hex(mainColor)[2:].zfill(6)}"},
             ax=axs[0],
         )
         sns.lineplot(
-            data=np.append(
-                k.model.predict(inputs),
-                outputs,
-                axis=0,
-            ).T,
+            data=k.model.predict(inp),
             palette={
-                0: "#8FCACA",
-                1: "#FFBEB5",
+                0: f"#{hex(mainColor - colorWeight*8)[2:].zfill(6)}",
+                1: f"#{hex(mainColor - colorWeight*7)[2:].zfill(6)}",
+                2: f"#{hex(mainColor - colorWeight*6)[2:].zfill(6)}",
+                3: f"#{hex(mainColor - colorWeight*5)[2:].zfill(6)}",
+                4: f"#{hex(mainColor - colorWeight*4)[2:].zfill(6)}",
+                5: f"#{hex(mainColor - colorWeight*3)[2:].zfill(6)}",
+                6: f"#{hex(mainColor - colorWeight*2)[2:].zfill(6)}",
+                7: f"#{hex(mainColor - colorWeight*1)[2:].zfill(6)}",
+                8: f"#{hex(mainColor - colorWeight*0)[2:].zfill(6)}",
             },
-            dashes={0: "", 1: ""},
+            dashes={0: "", 1: "", 2: "", 3: "", 4: "", 5: "", 6: "", 7: "", 8: ""},
             ax=axs[1],
+        )
+        sns.heatmap(
+            data=np.mean(
+                k.model.predict(
+                    np.array(
+                        [
+                            r.state(np.array([row, col]))
+                            for col in range(r.dims[1])
+                            for row in range(r.dims[0])
+                        ]
+                    )
+                ),
+                axis=1,
+            ).reshape((8, 8)),
+            # color={0: "#957DAD"},
+            ax=axs[2],
+            # norm=LogNorm(),
+            cbar=False,
+            cmap="mako",
         )
 
         files.append(f"./chessPaths/results/{epoch}.png")
