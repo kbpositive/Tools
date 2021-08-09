@@ -61,7 +61,7 @@ class Knight(Piece):
 if __name__ == "__main__":
     k = King(np.array([0, 0]))
 
-    r = Board(np.zeros((8, 8)) + (1.0 / len(k.moves)))
+    r = Board(np.zeros((8, 8)) + 0.5)
     r.rewards[-1][0] = 1.0
     r.rewards[0][-1] = 1.0
     r.rewards[0][0] = 0.0
@@ -82,12 +82,33 @@ if __name__ == "__main__":
         [
             tf.nn.softmax(
                 [
-                    r.reward(np.array([row, col]) + move)
-                    if (
-                        0 <= (np.array([row, col]) + move)[0] < r.dims[0]
-                        and 0 <= (np.array([row, col]) + move)[1] < r.dims[1]
+                    (
+                        r.reward(np.array([row, col]) + move)
+                        if (
+                            0 <= (np.array([row, col]) + move)[0] < r.dims[0]
+                            and 0 <= (np.array([row, col]) + move)[1] < r.dims[1]
+                        )
+                        else r.reward(np.array([row, col]))
                     )
-                    else r.reward(np.array([row, col]))
+                    * (0.95 ** 1)
+                    + sum(
+                        [
+                            r.reward(np.array([row, col]) + move + nxtmove)
+                            for nxtmove in k.moves.values()
+                            if (
+                                0 <= (np.array([row, col]) + move)[0] < r.dims[0]
+                                and 0 <= (np.array([row, col]) + move)[1] < r.dims[1]
+                                and 0
+                                <= (np.array([row, col]) + move + nxtmove)[0]
+                                < r.dims[0]
+                                and 0
+                                <= (np.array([row, col]) + move + nxtmove)[1]
+                                < r.dims[1]
+                            )
+                        ]
+                    )
+                    / len(k.moves)
+                    * (0.95 ** 2)
                     for move in k.moves.values()
                 ]
             )
@@ -97,7 +118,7 @@ if __name__ == "__main__":
     )
     result = []
     files = []
-    for epoch in range(200):
+    for epoch in range(150):
         history = k.model.fit(
             inp,
             out,
@@ -132,31 +153,38 @@ if __name__ == "__main__":
             dashes={0: "", 1: "", 2: "", 3: "", 4: "", 5: "", 6: "", 7: "", 8: ""},
             ax=axs[1],
         )
-        sns.heatmap(
-            data=np.mean(
-                k.model.predict(
-                    np.array(
-                        [
-                            r.state(np.array([row, col]))
-                            for col in range(r.dims[1])
-                            for row in range(r.dims[0])
-                        ]
+        heatmap_data = np.array(
+            [
+                max(i) - np.mean(i)
+                for n, i in enumerate(
+                    k.model.predict(
+                        np.array(
+                            [
+                                r.state(np.array([row, col]))
+                                for col in range(r.dims[1])
+                                for row in range(r.dims[0])
+                            ]
+                        )
                     )
-                ),
-                axis=1,
-            ).reshape((8, 8)),
+                )
+            ]
+        ).reshape((8, 8))
+        sns.heatmap(
+            data=heatmap_data,
             # color={0: "#957DAD"},
             ax=axs[2],
-            # norm=LogNorm(),
             cbar=False,
+            center=np.mean(heatmap_data),
+            vmin=np.mean(heatmap_data) - 0.05,
+            vmax=np.mean(heatmap_data) + 0.05,
             cmap="mako",
         )
 
-        files.append(f"./chessPaths/results/{epoch}.png")
+        files.append(f"./results/{epoch}.png")
         plt.savefig(files[-1])
         plt.close()
 
-    with imageio.get_writer("./chessPaths/results.gif", mode="I") as writer:
+    with imageio.get_writer("./results.gif", mode="I") as writer:
         for file in files:
             image = imageio.imread(file)
             writer.append_data(image)
