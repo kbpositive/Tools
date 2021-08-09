@@ -61,7 +61,7 @@ class Knight(Piece):
 if __name__ == "__main__":
     k = King(np.array([0, 0]))
 
-    r = Board(np.zeros((8, 8)) + 0.5)
+    r = Board(np.zeros((8, 8)) + (0.5 / 2.0))
     r.rewards[-1][0] = 1.0
     r.rewards[0][-1] = 1.0
     r.rewards[0][0] = 0.0
@@ -80,7 +80,7 @@ if __name__ == "__main__":
     )
     out = np.array(
         [
-            tf.nn.softmax(
+            (
                 [
                     (
                         r.reward(np.array([row, col]) + move)
@@ -156,15 +156,13 @@ if __name__ == "__main__":
         heatmap_data = np.array(
             [
                 max(i) - np.mean(i)
-                for n, i in enumerate(
-                    k.model.predict(
-                        np.array(
-                            [
-                                r.state(np.array([row, col]))
-                                for col in range(r.dims[1])
-                                for row in range(r.dims[0])
-                            ]
-                        )
+                for i in k.model.predict(
+                    np.array(
+                        [
+                            r.state(np.array([row, col]))
+                            for col in range(r.dims[1])
+                            for row in range(r.dims[0])
+                        ]
                     )
                 )
             ]
@@ -175,9 +173,9 @@ if __name__ == "__main__":
             ax=axs[2],
             cbar=False,
             center=np.mean(heatmap_data),
-            vmin=np.mean(heatmap_data) - 0.05,
-            vmax=np.mean(heatmap_data) + 0.05,
-            cmap="mako",
+            vmin=np.mean(heatmap_data) - 0.4,
+            vmax=np.mean(heatmap_data) + 0.4,
+            cmap=sns.color_palette("light:#957DAD", as_cmap=True),
         )
 
         files.append(f"./results/{epoch}.png")
