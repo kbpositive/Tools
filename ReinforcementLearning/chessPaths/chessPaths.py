@@ -61,7 +61,7 @@ class Knight(Piece):
 if __name__ == "__main__":
     k = King(np.array([0, 0]))
 
-    r = Board(np.zeros((8, 8)) + (0.5 / 2.0))
+    r = Board(np.zeros((8, 8)) + 1.0 / len(k.moves))
     r.rewards[-1][0] = 1.0
     r.rewards[0][-1] = 1.0
     r.rewards[0][0] = 0.0
@@ -71,6 +71,7 @@ if __name__ == "__main__":
     r.rewards[3][4] = 0.0
     r.rewards[4][3] = 0.0
 
+    discount = 0.95
     inp = np.array(
         [
             r.state(np.array([row, col]))
@@ -104,18 +105,6 @@ if __name__ == "__main__":
                                     for nxtnxtmove in k.moves.values()
                                     if (
                                         0
-                                        <= (np.array([row, col]) + move)[0]
-                                        < r.dims[0]
-                                        and 0
-                                        <= (np.array([row, col]) + move)[1]
-                                        < r.dims[1]
-                                        and 0
-                                        <= (np.array([row, col]) + move + nxtmove)[0]
-                                        < r.dims[0]
-                                        and 0
-                                        <= (np.array([row, col]) + move + nxtmove)[1]
-                                        < r.dims[1]
-                                        and 0
                                         <= (
                                             np.array([row, col])
                                             + move
@@ -134,7 +123,7 @@ if __name__ == "__main__":
                                     )
                                 ]
                             )
-                            * (0.95 ** 3)
+                            * (discount ** 3)
                             / len(k.moves)
                             for nxtmove in k.moves.values()
                             if (
@@ -149,7 +138,7 @@ if __name__ == "__main__":
                             )
                         ]
                     )
-                    * (0.95 ** 2)
+                    * (discount ** 2)
                     / len(k.moves)
                     for move in k.moves.values()
                 ]
@@ -157,7 +146,8 @@ if __name__ == "__main__":
             for row in range(r.dims[0])
             for col in range(r.dims[1])
         ]
-    ) * (0.95 ** 1)
+    ) * (discount ** 1)
+
     result = []
     files = []
     for epoch in range(150):
@@ -213,9 +203,6 @@ if __name__ == "__main__":
             data=heatmap_data,
             ax=axs[2],
             cbar=False,
-            center=np.mean(heatmap_data),
-            vmin=np.amin(heatmap_data),
-            vmax=np.amax(heatmap_data),
             cmap=sns.light_palette("#957DAD", as_cmap=True, reverse=True),
         ).invert_yaxis()
 
