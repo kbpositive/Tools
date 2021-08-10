@@ -160,7 +160,7 @@ if __name__ == "__main__":
         )
 
         result.append(history.history[[i for i in history.history.keys()][-1]])
-        sns.set(rc={"figure.figsize": (20, 7)})
+        sns.set(rc={"figure.figsize": (15, 6)})
         fig, axs = plt.subplots(ncols=3)
         mainColor = 0x8FCACA
         colorWeight = 0x0A0A0A
