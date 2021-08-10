@@ -74,8 +74,12 @@ class List:
 
         if current.next != self.head:
             current.next = Node(item, current.next)
+            current = current.next
         else:
             self.head = current
+
+        if not current.next:
+            self.tail = current
 
         self.size += 1
 
@@ -97,6 +101,9 @@ class List:
         else:
             self.head = current.next.next
 
+        if current and not current.next:
+            self.tail = current
+
         self.size -= 1
 
     def remove_item(self, search):
@@ -115,6 +122,9 @@ class List:
             current.next = current.next.next
         else:
             self.head = current.next.next
+
+        if current and not current.next:
+            self.tail = current
 
         self.size -= 1
 
@@ -151,7 +161,9 @@ if __name__ == "__main__":
     assert G.print_list() == [1, 3, 2]
     assert L.print_list() == [2, 4, 3, 2, 0, 1, 9, 8, 7, 6, 5, 4, 0]
     assert G.length == 3
+    assert G.tail.val == 2
     assert L.length == 13
+    assert L.tail.val == 0
 
     G = List()
 
@@ -168,20 +180,26 @@ if __name__ == "__main__":
     assert G.print_list() == [7, 9, 5, 4, 3]
     assert L.print_list() == [2, 4, 3, 2, 0, 0, 1, 1, 9, 8, 7, 6, 5, 5, 4, 0]
     assert G.length == 5
+    assert G.tail.val == 3
     assert L.length == 16
+    assert L.tail.val == 0
 
     L.remove_item(7)
     L.remove_item(6)
     L.remove_item(0)
+    L.remove_item(0)
+    L.remove_item(0)
     L.remove_item(1)
 
-    assert L.print_list() == [2, 4, 3, 2, 0, 1, 9, 8, 5, 5, 4, 0]
-    assert L.length == 12
+    assert L.print_list() == [2, 4, 3, 2, 1, 9, 8, 5, 5, 4]
+    assert L.length == 10
+    assert L.tail.val == 4
 
-    for i in range(3):
+    for i in range(9, 9 - 3, -1):
         L.remove_index(i)
 
-    assert L.print_list() == [4, 2, 1, 9, 8, 5, 5, 4, 0]
-    assert L.length == 9
+    assert L.print_list() == [2, 4, 3, 2, 1, 9, 8]
+    assert L.length == 7
+    assert L.tail.val == 8
 
     print("Pass")
