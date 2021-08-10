@@ -78,96 +78,86 @@ if __name__ == "__main__":
             for col in range(r.dims[1])
         ]
     )
-    out = (
-        np.array(
-            [
-                (
-                    [
-                        (
-                            r.reward(np.array([row, col]) + move)
-                            if (
-                                0 <= (np.array([row, col]) + move)[0] < r.dims[0]
-                                and 0 <= (np.array([row, col]) + move)[1] < r.dims[1]
-                            )
-                            else r.reward(np.array([row, col]))
+    out = np.array(
+        [
+            (
+                [
+                    (
+                        r.reward(np.array([row, col]) + move)
+                        if (
+                            0 <= (np.array([row, col]) + move)[0] < r.dims[0]
+                            and 0 <= (np.array([row, col]) + move)[1] < r.dims[1]
                         )
-                        + sum(
-                            [
-                                r.reward(np.array([row, col]) + move + nxtmove)
-                                + sum(
-                                    [
-                                        r.reward(
+                        else r.reward(np.array([row, col]))
+                    )
+                    + sum(
+                        [
+                            r.reward(np.array([row, col]) + move + nxtmove)
+                            + sum(
+                                [
+                                    r.reward(
+                                        np.array([row, col])
+                                        + move
+                                        + nxtmove
+                                        + nxtnxtmove
+                                    )
+                                    for nxtnxtmove in k.moves.values()
+                                    if (
+                                        0
+                                        <= (np.array([row, col]) + move)[0]
+                                        < r.dims[0]
+                                        and 0
+                                        <= (np.array([row, col]) + move)[1]
+                                        < r.dims[1]
+                                        and 0
+                                        <= (np.array([row, col]) + move + nxtmove)[0]
+                                        < r.dims[0]
+                                        and 0
+                                        <= (np.array([row, col]) + move + nxtmove)[1]
+                                        < r.dims[1]
+                                        and 0
+                                        <= (
                                             np.array([row, col])
                                             + move
                                             + nxtmove
                                             + nxtnxtmove
-                                        )
-                                        for nxtnxtmove in k.moves.values()
-                                        if (
-                                            0
-                                            <= (np.array([row, col]) + move)[0]
-                                            < r.dims[0]
-                                            and 0
-                                            <= (np.array([row, col]) + move)[1]
-                                            < r.dims[1]
-                                            and 0
-                                            <= (np.array([row, col]) + move + nxtmove)[
-                                                0
-                                            ]
-                                            < r.dims[0]
-                                            and 0
-                                            <= (np.array([row, col]) + move + nxtmove)[
-                                                1
-                                            ]
-                                            < r.dims[1]
-                                            and 0
-                                            <= (
-                                                np.array([row, col])
-                                                + move
-                                                + nxtmove
-                                                + nxtnxtmove
-                                            )[0]
-                                            < r.dims[0]
-                                            and 0
-                                            <= (
-                                                np.array([row, col])
-                                                + move
-                                                + nxtmove
-                                                + nxtnxtmove
-                                            )[1]
-                                            < r.dims[1]
-                                        )
-                                    ]
-                                )
-                                * (0.95 ** 3)
-                                / len(k.moves)
-                                for nxtmove in k.moves.values()
-                                if (
-                                    0 <= (np.array([row, col]) + move)[0] < r.dims[0]
-                                    and 0
-                                    <= (np.array([row, col]) + move)[1]
-                                    < r.dims[1]
-                                    and 0
-                                    <= (np.array([row, col]) + move + nxtmove)[0]
-                                    < r.dims[0]
-                                    and 0
-                                    <= (np.array([row, col]) + move + nxtmove)[1]
-                                    < r.dims[1]
-                                )
-                            ]
-                        )
-                        * (0.95 ** 2)
-                        / len(k.moves)
-                        for move in k.moves.values()
-                    ]
-                )
-                for row in range(r.dims[0])
-                for col in range(r.dims[1])
-            ]
-        )
-        * (0.95 ** 1)
-        / 1.0
-    )
+                                        )[0]
+                                        < r.dims[0]
+                                        and 0
+                                        <= (
+                                            np.array([row, col])
+                                            + move
+                                            + nxtmove
+                                            + nxtnxtmove
+                                        )[1]
+                                        < r.dims[1]
+                                    )
+                                ]
+                            )
+                            * (0.95 ** 3)
+                            / len(k.moves)
+                            for nxtmove in k.moves.values()
+                            if (
+                                0 <= (np.array([row, col]) + move)[0] < r.dims[0]
+                                and 0 <= (np.array([row, col]) + move)[1] < r.dims[1]
+                                and 0
+                                <= (np.array([row, col]) + move + nxtmove)[0]
+                                < r.dims[0]
+                                and 0
+                                <= (np.array([row, col]) + move + nxtmove)[1]
+                                < r.dims[1]
+                            )
+                        ]
+                    )
+                    * (0.95 ** 2)
+                    / len(k.moves)
+                    for move in k.moves.values()
+                ]
+            )
+            for row in range(r.dims[0])
+            for col in range(r.dims[1])
+        ]
+    ) * (0.95 ** 1)
     result = []
     files = []
     for epoch in range(150):
