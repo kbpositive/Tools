@@ -78,43 +78,95 @@ if __name__ == "__main__":
             for col in range(r.dims[1])
         ]
     )
-    out = np.array(
-        [
-            (
-                [
-                    (
-                        r.reward(np.array([row, col]) + move)
-                        if (
-                            0 <= (np.array([row, col]) + move)[0] < r.dims[0]
-                            and 0 <= (np.array([row, col]) + move)[1] < r.dims[1]
-                        )
-                        else r.reward(np.array([row, col]))
-                    )
-                    * (0.95 ** 1)
-                    + sum(
-                        [
-                            r.reward(np.array([row, col]) + move + nxtmove)
-                            for nxtmove in k.moves.values()
+    out = (
+        np.array(
+            [
+                (
+                    [
+                        (
+                            r.reward(np.array([row, col]) + move)
                             if (
                                 0 <= (np.array([row, col]) + move)[0] < r.dims[0]
                                 and 0 <= (np.array([row, col]) + move)[1] < r.dims[1]
-                                and 0
-                                <= (np.array([row, col]) + move + nxtmove)[0]
-                                < r.dims[0]
-                                and 0
-                                <= (np.array([row, col]) + move + nxtmove)[1]
-                                < r.dims[1]
                             )
-                        ]
-                    )
-                    / len(k.moves)
-                    * (0.95 ** 2)
-                    for move in k.moves.values()
-                ]
-            )
-            for row in range(r.dims[0])
-            for col in range(r.dims[1])
-        ]
+                            else r.reward(np.array([row, col]))
+                        )
+                        + sum(
+                            [
+                                r.reward(np.array([row, col]) + move + nxtmove)
+                                + sum(
+                                    [
+                                        r.reward(
+                                            np.array([row, col])
+                                            + move
+                                            + nxtmove
+                                            + nxtnxtmove
+                                        )
+                                        for nxtnxtmove in k.moves.values()
+                                        if (
+                                            0
+                                            <= (np.array([row, col]) + move)[0]
+                                            < r.dims[0]
+                                            and 0
+                                            <= (np.array([row, col]) + move)[1]
+                                            < r.dims[1]
+                                            and 0
+                                            <= (np.array([row, col]) + move + nxtmove)[
+                                                0
+                                            ]
+                                            < r.dims[0]
+                                            and 0
+                                            <= (np.array([row, col]) + move + nxtmove)[
+                                                1
+                                            ]
+                                            < r.dims[1]
+                                            and 0
+                                            <= (
+                                                np.array([row, col])
+                                                + move
+                                                + nxtmove
+                                                + nxtnxtmove
+                                            )[0]
+                                            < r.dims[0]
+                                            and 0
+                                            <= (
+                                                np.array([row, col])
+                                                + move
+                                                + nxtmove
+                                                + nxtnxtmove
+                                            )[1]
+                                            < r.dims[1]
+                                        )
+                                    ]
+                                )
+                                * (0.95 ** 3)
+                                / len(k.moves)
+                                for nxtmove in k.moves.values()
+                                if (
+                                    0 <= (np.array([row, col]) + move)[0] < r.dims[0]
+                                    and 0
+                                    <= (np.array([row, col]) + move)[1]
+                                    < r.dims[1]
+                                    and 0
+                                    <= (np.array([row, col]) + move + nxtmove)[0]
+                                    < r.dims[0]
+                                    and 0
+                                    <= (np.array([row, col]) + move + nxtmove)[1]
+                                    < r.dims[1]
+                                )
+                            ]
+                        )
+                        * (0.95 ** 2)
+                        / len(k.moves)
+                        for move in k.moves.values()
+                    ]
+                )
+                for row in range(r.dims[0])
+                for col in range(r.dims[1])
+            ]
+        )
+        * (0.95 ** 1)
+        / 1.0
     )
     result = []
     files = []
@@ -155,7 +207,7 @@ if __name__ == "__main__":
         )
         heatmap_data = np.array(
             [
-                max(i) - np.mean(i)
+                np.mean(i)
                 for i in k.model.predict(
                     np.array(
                         [
@@ -169,14 +221,13 @@ if __name__ == "__main__":
         ).reshape((8, 8))
         sns.heatmap(
             data=heatmap_data,
-            # color={0: "#957DAD"},
             ax=axs[2],
             cbar=False,
             center=np.mean(heatmap_data),
-            vmin=np.mean(heatmap_data) - 0.4,
-            vmax=np.mean(heatmap_data) + 0.4,
-            cmap=sns.color_palette("light:#957DAD", as_cmap=True),
-        )
+            vmin=np.amin(heatmap_data),
+            vmax=np.amax(heatmap_data),
+            cmap=sns.light_palette("#957DAD", as_cmap=True, reverse=True),
+        ).invert_yaxis()
 
         files.append(f"./results/{epoch}.png")
         plt.savefig(files[-1])
