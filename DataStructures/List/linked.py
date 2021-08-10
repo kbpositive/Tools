@@ -8,6 +8,11 @@ class List:
     def __init__(self, head=None, size=0):
         self.head = head
         self.size = size
+        self.tail = self.head
+        while self.tail:
+            if self.tail.next == None:
+                break
+            self.tail = self.tail.next
 
     def print_list(self):
         listToPrint = []
@@ -43,11 +48,17 @@ class List:
         if current.next != self.head:
             current.next = Node(item, current.next)
 
+            # push current node forward by 1 to check if it's a tail node.
+            current = current.next
+
         # if the current node is pointing to the list's head,
         # the list is empty or the insertion point is the head.
         # In this case, we can make the current/new node the head.
         else:
             self.head = current
+
+        if not current.next:
+            self.tail = current
 
         # increment the list's size parameter
         self.size += 1
@@ -111,6 +122,10 @@ class List:
     def length(self):
         return self.size
 
+    @property
+    def tailEnd(self):
+        return self.tail
+
 
 if __name__ == "__main__":
     L = List()
@@ -121,6 +136,7 @@ if __name__ == "__main__":
 
     assert L.print_list() == [3, 2, 1, 9, 8, 7, 6, 5, 4, 0]
     assert L.length == 10
+    assert L.tail.val == 0
 
     G = List()
 
