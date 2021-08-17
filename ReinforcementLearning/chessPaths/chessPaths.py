@@ -14,7 +14,9 @@ class Board:
         self.dims = np.array([len(self.rewards), len(self.rewards[0])])
 
     def state(self, pos):
-        return np.eye(64)[(pos[0] * 8) + pos[1]]
+        return np.array(
+            [1 if int(i) else -1 for i in format(pos[0], "03b") + format(pos[1], "03b")]
+        )
 
     def reward(self, pos):
         return self.rewards[pos[0]][pos[1]]
@@ -43,9 +45,12 @@ class King(Piece):
         }
 
         self.model = models.Sequential(
-            [layers.Dense(len(self.moves), input_shape=(64,), activation="sigmoid")]
+            [
+                layers.Dense(9, input_shape=(6,), activation="relu"),
+                layers.Dense(len(self.moves), activation="sigmoid"),
+            ]
         )
-        self.optimizer = optimizers.Adam(learning_rate=0.04)
+        self.optimizer = optimizers.Adam(learning_rate=0.006)
         self.model.compile(
             loss=self.reinforce,
             optimizer=self.optimizer,
@@ -150,7 +155,7 @@ if __name__ == "__main__":
 
     result = []
     files = []
-    for epoch in range(150):
+    for epoch in range(300):
         history = k.model.fit(
             inp,
             out,
