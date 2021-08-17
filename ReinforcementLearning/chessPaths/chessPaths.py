@@ -212,7 +212,8 @@ if __name__ == "__main__":
         ).invert_yaxis()
 
         files.append(f"./results/{epoch}.png")
-        plt.savefig(files[-1])
+        if not epoch % 10:
+            plt.savefig(files[-1])
         plt.close()
 
     with imageio.get_writer("./results.gif", mode="I") as writer:
