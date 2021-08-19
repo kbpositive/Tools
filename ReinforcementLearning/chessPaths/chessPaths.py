@@ -213,8 +213,8 @@ class Queen(Piece):
 
 if __name__ == "__main__":
     # chess_piece = King(np.array([0, 0]))
-    chess_piece = Queen(np.array([0, 0]))
-    label = "Queen"
+    chess_piece = Bishop(np.array([0, 0]))
+    label = "Bishop"
 
     r = Board(np.zeros((8, 8)) + 1.0 / len(chess_piece.moves))
     r.rewards[-1][0] = 1.0
@@ -294,6 +294,7 @@ if __name__ == "__main__":
             data=heatmap_data,
             ax=axs[2],
             cbar=False,
+            norm=LogNorm(),
             cmap=sns.light_palette("#957DAD", as_cmap=True, reverse=True),
         ).invert_yaxis()
 
