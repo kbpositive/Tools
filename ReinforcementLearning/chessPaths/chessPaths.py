@@ -212,8 +212,8 @@ class Queen(Piece):
 
 
 if __name__ == "__main__":
-    chess_piece = Knight(np.array([0, 0]))
-    label = "Knight"
+    chess_piece = Bishop(np.array([0, 0]))
+    label = "Bishop"
 
     r = Board(np.zeros((8, 8)) + 1.0 / len(chess_piece.moves))
     r.rewards[0][0] = 1.0
@@ -235,7 +235,7 @@ if __name__ == "__main__":
                 r,
                 chess_piece.moves.values(),
                 np.array([row, col]),
-                4,
+                2,
             )
             for row in range(r.dims[0])
             for col in range(r.dims[1])
