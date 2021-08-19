@@ -160,10 +160,33 @@ class Bishop(Piece):
         super(Bishop, self).__init__(rewards)
 
 
+class Rook(Piece):
+    def __init__(self, rewards):
+        self.moves = {0: np.array([0, 0])}
+        for i in range(1, 8):
+            self.moves[i] = np.array([i, 0])
+            self.moves[i + 7] = np.array([-i, 0])
+            self.moves[i + 14] = np.array([0, -i])
+            self.moves[i + 21] = np.array([0, i])
+
+        self.model = models.Sequential(
+            [
+                layers.Dense(len(self.moves), input_shape=(64,), activation="sigmoid"),
+            ]
+        )
+        self.optimizer = optimizers.Adam(learning_rate=0.06)
+        self.model.compile(
+            loss=self.reinforce,
+            optimizer=self.optimizer,
+            metrics=tf.keras.metrics.MeanAbsoluteError(),
+        )
+        super(Rook, self).__init__(rewards)
+
+
 if __name__ == "__main__":
     # chess_piece = King(np.array([0, 0]))
-    chess_piece = Bishop(np.array([0, 0]))
-    label = "Bishop"
+    chess_piece = Rook(np.array([0, 0]))
+    label = "Rook"
 
     r = Board(np.zeros((8, 8)) + 1.0 / len(chess_piece.moves))
     r.rewards[-1][0] = 1.0

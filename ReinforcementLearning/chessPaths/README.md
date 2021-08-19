@@ -8,3 +8,6 @@ Knight
 
 Bishop
 ![](./Bishop.gif?raw=true)
+
+Rook
+![](./Rook.gif?raw=true)
