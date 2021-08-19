@@ -6,6 +6,7 @@ import matplotlib.pyplot as plt
 from matplotlib.colors import LogNorm
 import imageio
 import os
+import random
 
 
 class Board:
@@ -29,56 +30,79 @@ class Piece:
         return pred - actual * tf.math.log(pred)
 
     def rollout(self, board, moves, state, timesteps, depth=1):
-        if timesteps == 0:
-            return np.array(
-                [
-                    board.reward(
-                        state + action
-                        if (
-                            0 <= (state + action)[0] < board.dims[0]
-                            and 0 <= (state + action)[1] < board.dims[1]
-                        )
-                        else state
-                    )
-                    for action in moves
-                ]
-            ) * (self.discount ** depth)
-
-        return (
-            np.array(
-                [
-                    board.reward(
-                        state + action
-                        if (
-                            0 <= (state + action)[0] < board.dims[0]
-                            and 0 <= (state + action)[1] < board.dims[1]
-                        )
-                        else state
-                    )
-                    + np.sum(
+        if -1 < timesteps:
+            if depth == 1:
+                guesses = [random.choice(moves)]
+                return (
+                    np.array(
                         [
-                            self.rollout(
-                                board,
-                                moves,
-                                np.array(
-                                    state + action
-                                    if (
-                                        0 <= (state + action)[0] < board.dims[0]
-                                        and 0 <= (state + action)[1] < board.dims[1]
-                                    )
-                                    else state
-                                ),
-                                timesteps - 1,
-                                depth + 1,
+                            board.reward(
+                                state + action
+                                if (
+                                    0 <= (state + action)[0] < board.dims[0]
+                                    and 0 <= (state + action)[1] < board.dims[1]
+                                )
+                                else state
                             )
+                            for action in moves
                         ]
                     )
-                    / len(moves)
-                    for action in moves
-                ]
-            )
-            * (self.discount ** depth)
-        )
+                    + (
+                        np.sum(
+                            [
+                                self.rollout(
+                                    board,
+                                    moves,
+                                    np.array(
+                                        state + guess
+                                        if (
+                                            0 <= (state + guess)[0] < board.dims[0]
+                                            and 0 <= (state + guess)[1] < board.dims[1]
+                                        )
+                                        else state
+                                    ),
+                                    timesteps - 1,
+                                    depth + 1,
+                                )
+                                for guess in guesses
+                            ]
+                        )
+                        / 1
+                    )
+                ) * (self.discount ** depth)
+
+            guesses = [random.choice(moves)]
+            return (
+                np.sum(
+                    [
+                        board.reward(
+                            state + guess
+                            if (
+                                0 <= (state + guess)[0] < board.dims[0]
+                                and 0 <= (state + guess)[1] < board.dims[1]
+                            )
+                            else state
+                        )
+                        + self.rollout(
+                            board,
+                            moves,
+                            np.array(
+                                state + guess
+                                if (
+                                    0 <= (state + guess)[0] < board.dims[0]
+                                    and 0 <= (state + guess)[1] < board.dims[1]
+                                )
+                                else state
+                            ),
+                            timesteps - 1,
+                            depth + 1,
+                        )
+                        for guess in guesses
+                    ]
+                )
+                / 1
+            ) * (self.discount ** depth)
+        return 0
 
 
 class King(Piece):
@@ -212,8 +236,9 @@ class Queen(Piece):
 
 
 if __name__ == "__main__":
-    chess_piece = Queen(np.array([0, 0]))
-    label = "Queen"
+    chess_piece = Bishop(np.array([0, 0]))
+    label = "Bishop"
+    timesteps = 16
 
     r = Board(np.zeros((8, 8)) + 1.0 / len(chess_piece.moves))
     r.rewards[6][6] = 1.0
@@ -227,22 +252,25 @@ if __name__ == "__main__":
         ]
     )
 
-    out = np.array(
-        [
-            chess_piece.rollout(
-                r,
-                chess_piece.moves.values(),
-                np.array([row, col]),
-                2,
-            )
-            for row in range(r.dims[0])
-            for col in range(r.dims[1])
-        ]
-    )
-
     result = []
     files = []
     for epoch in range(100):
+        out = (
+            np.array(
+                [
+                    chess_piece.rollout(
+                        r,
+                        list(chess_piece.moves.values()),
+                        np.array([row, col]),
+                        timesteps,
+                    )
+                    for row in range(r.dims[0])
+                    for col in range(r.dims[1])
+                ]
+            )
+            / timesteps
+        )
+
         history = chess_piece.model.fit(
             inp,
             out,
