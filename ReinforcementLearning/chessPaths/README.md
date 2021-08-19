@@ -11,3 +11,6 @@ Bishop
 
 Rook
 ![](./Rook.gif?raw=true)
+
+Queen
+![](./Queen.gif?raw=true)
