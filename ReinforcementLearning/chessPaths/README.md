@@ -1,3 +1,7 @@
-chess path prediction problem
+chess path prediction
 
-![](./results.gif?raw=true)
+King
+![](./King.gif?raw=true)
+
+Knight
+![](./Knight.gif?raw=true)

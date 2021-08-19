@@ -14,9 +14,7 @@ class Board:
         self.dims = np.array([len(self.rewards), len(self.rewards[0])])
 
     def state(self, pos):
-        return np.array(
-            [1 if int(i) else -1 for i in format(pos[0], "03b") + format(pos[1], "03b")]
-        )
+        return np.eye(self.dims[0] * self.dims[1])[pos[0] * 8 + pos[1]]
 
     def reward(self, pos):
         return self.rewards[pos[0]][pos[1]]
@@ -25,9 +23,62 @@ class Board:
 class Piece:
     def __init__(self, pos):
         self.pos = pos
+        self.discount = 0.95
 
     def reinforce(self, actual, pred):
         return pred - actual * tf.math.log(pred)
+
+    def rollout(self, board, moves, state, timesteps, depth=1):
+        if timesteps == 0:
+            return np.array(
+                [
+                    board.reward(
+                        state + action
+                        if (
+                            0 <= (state + action)[0] < board.dims[0]
+                            and 0 <= (state + action)[1] < board.dims[1]
+                        )
+                        else state
+                    )
+                    for action in moves
+                ]
+            ) * (self.discount ** depth)
+
+        return (
+            np.array(
+                [
+                    board.reward(
+                        state + action
+                        if (
+                            0 <= (state + action)[0] < board.dims[0]
+                            and 0 <= (state + action)[1] < board.dims[1]
+                        )
+                        else state
+                    )
+                    + np.sum(
+                        [
+                            self.rollout(
+                                board,
+                                moves,
+                                np.array(
+                                    state + action
+                                    if (
+                                        0 <= (state + action)[0] < board.dims[0]
+                                        and 0 <= (state + action)[1] < board.dims[1]
+                                    )
+                                    else state
+                                ),
+                                timesteps - 1,
+                                depth + 1,
+                            )
+                        ]
+                    )
+                    / len(moves)
+                    for action in moves
+                ]
+            )
+            * (self.discount ** depth)
+        )
 
 
 class King(Piece):
@@ -46,11 +97,10 @@ class King(Piece):
 
         self.model = models.Sequential(
             [
-                layers.Dense(9, input_shape=(6,), activation="relu"),
-                layers.Dense(len(self.moves), activation="sigmoid"),
+                layers.Dense(len(self.moves), input_shape=(64,), activation="sigmoid"),
             ]
         )
-        self.optimizer = optimizers.Adam(learning_rate=0.006)
+        self.optimizer = optimizers.Adam(learning_rate=0.06)
         self.model.compile(
             loss=self.reinforce,
             optimizer=self.optimizer,
@@ -60,11 +110,37 @@ class King(Piece):
 
 
 class Knight(Piece):
-    pass
+    def __init__(self, rewards):
+        self.moves = {
+            0: np.array([-2, -1]),
+            1: np.array([-1, -2]),
+            2: np.array([2, -1]),
+            3: np.array([1, -2]),
+            4: np.array([0, 0]),
+            5: np.array([-2, 1]),
+            6: np.array([-1, 2]),
+            7: np.array([2, 1]),
+            8: np.array([1, 2]),
+        }
+
+        self.model = models.Sequential(
+            [
+                layers.Dense(len(self.moves), input_shape=(64,), activation="sigmoid"),
+            ]
+        )
+        self.optimizer = optimizers.Adam(learning_rate=0.06)
+        self.model.compile(
+            loss=self.reinforce,
+            optimizer=self.optimizer,
+            metrics=tf.keras.metrics.MeanAbsoluteError(),
+        )
+        super(Knight, self).__init__(rewards)
 
 
 if __name__ == "__main__":
-    k = King(np.array([0, 0]))
+    # k = King(np.array([0, 0]))
+    k = Knight(np.array([0, 0]))
+    label = "Knight"
 
     r = Board(np.zeros((8, 8)) + 1.0 / len(k.moves))
     r.rewards[-1][0] = 1.0
@@ -76,7 +152,6 @@ if __name__ == "__main__":
     r.rewards[3][4] = 0.0
     r.rewards[4][3] = 0.0
 
-    discount = 0.95
     inp = np.array(
         [
             r.state(np.array([row, col]))
@@ -84,78 +159,23 @@ if __name__ == "__main__":
             for col in range(r.dims[1])
         ]
     )
+
     out = np.array(
         [
-            (
-                [
-                    (
-                        r.reward(np.array([row, col]) + move)
-                        if (
-                            0 <= (np.array([row, col]) + move)[0] < r.dims[0]
-                            and 0 <= (np.array([row, col]) + move)[1] < r.dims[1]
-                        )
-                        else r.reward(np.array([row, col]))
-                    )
-                    + sum(
-                        [
-                            r.reward(np.array([row, col]) + move + nxtmove)
-                            + sum(
-                                [
-                                    r.reward(
-                                        np.array([row, col])
-                                        + move
-                                        + nxtmove
-                                        + nxtnxtmove
-                                    )
-                                    for nxtnxtmove in k.moves.values()
-                                    if (
-                                        0
-                                        <= (
-                                            np.array([row, col])
-                                            + move
-                                            + nxtmove
-                                            + nxtnxtmove
-                                        )[0]
-                                        < r.dims[0]
-                                        and 0
-                                        <= (
-                                            np.array([row, col])
-                                            + move
-                                            + nxtmove
-                                            + nxtnxtmove
-                                        )[1]
-                                        < r.dims[1]
-                                    )
-                                ]
-                            )
-                            * (discount ** 3)
-                            / len(k.moves)
-                            for nxtmove in k.moves.values()
-                            if (
-                                0 <= (np.array([row, col]) + move)[0] < r.dims[0]
-                                and 0 <= (np.array([row, col]) + move)[1] < r.dims[1]
-                                and 0
-                                <= (np.array([row, col]) + move + nxtmove)[0]
-                                < r.dims[0]
-                                and 0
-                                <= (np.array([row, col]) + move + nxtmove)[1]
-                                < r.dims[1]
-                            )
-                        ]
-                    )
-                    * (discount ** 2)
-                    / len(k.moves)
-                    for move in k.moves.values()
-                ]
+            k.rollout(
+                r,
+                k.moves.values(),
+                np.array([row, col]),
+                3,
             )
             for row in range(r.dims[0])
             for col in range(r.dims[1])
         ]
-    ) * (discount ** 1)
+    )
 
     result = []
     files = []
-    for epoch in range(300):
+    for epoch in range(100):
         history = k.model.fit(
             inp,
             out,
@@ -212,11 +232,10 @@ if __name__ == "__main__":
         ).invert_yaxis()
 
         files.append(f"./results/{epoch}.png")
-        if not epoch % 10:
-            plt.savefig(files[-1])
+        plt.savefig(files[-1])
         plt.close()
 
-    with imageio.get_writer("./results.gif", mode="I") as writer:
+    with imageio.get_writer(f"./{label}.gif", mode="I") as writer:
         for file in files:
             image = imageio.imread(file)
             writer.append_data(image)
