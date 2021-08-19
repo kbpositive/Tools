@@ -137,12 +137,35 @@ class Knight(Piece):
         super(Knight, self).__init__(rewards)
 
 
-if __name__ == "__main__":
-    # k = King(np.array([0, 0]))
-    k = Knight(np.array([0, 0]))
-    label = "Knight"
+class Bishop(Piece):
+    def __init__(self, rewards):
+        self.moves = {0: np.array([0, 0])}
+        for i in range(1, 8):
+            self.moves[i] = np.array([i, i])
+            self.moves[i + 7] = np.array([-i, -i])
+            self.moves[i + 14] = np.array([i, -i])
+            self.moves[i + 21] = np.array([-i, i])
 
-    r = Board(np.zeros((8, 8)) + 1.0 / len(k.moves))
+        self.model = models.Sequential(
+            [
+                layers.Dense(len(self.moves), input_shape=(64,), activation="sigmoid"),
+            ]
+        )
+        self.optimizer = optimizers.Adam(learning_rate=0.06)
+        self.model.compile(
+            loss=self.reinforce,
+            optimizer=self.optimizer,
+            metrics=tf.keras.metrics.MeanAbsoluteError(),
+        )
+        super(Bishop, self).__init__(rewards)
+
+
+if __name__ == "__main__":
+    # chess_piece = King(np.array([0, 0]))
+    chess_piece = Bishop(np.array([0, 0]))
+    label = "Bishop"
+
+    r = Board(np.zeros((8, 8)) + 1.0 / len(chess_piece.moves))
     r.rewards[-1][0] = 1.0
     r.rewards[0][-1] = 1.0
     r.rewards[0][0] = 0.0
@@ -162,11 +185,11 @@ if __name__ == "__main__":
 
     out = np.array(
         [
-            k.rollout(
+            chess_piece.rollout(
                 r,
-                k.moves.values(),
+                chess_piece.moves.values(),
                 np.array([row, col]),
-                3,
+                1,
             )
             for row in range(r.dims[0])
             for col in range(r.dims[1])
@@ -176,11 +199,10 @@ if __name__ == "__main__":
     result = []
     files = []
     for epoch in range(100):
-        history = k.model.fit(
+        history = chess_piece.model.fit(
             inp,
             out,
             epochs=1,
-            batch_size=64,
             verbose=0,
         )
 
@@ -188,32 +210,25 @@ if __name__ == "__main__":
         sns.set(rc={"figure.figsize": (15, 6)})
         fig, axs = plt.subplots(ncols=3)
         mainColor = 0x8FCACA
-        colorWeight = 0x0A0A0A
+        colorWeight = 0x0000D0
         sns.lineplot(
             data=np.array(result),
             color={0: f"#{hex(mainColor)[2:].zfill(6)}"},
             ax=axs[0],
         )
         sns.lineplot(
-            data=k.model.predict(inp),
+            data=chess_piece.model.predict(inp),
             palette={
-                0: f"#{hex(mainColor - colorWeight*8)[2:].zfill(6)}",
-                1: f"#{hex(mainColor - colorWeight*7)[2:].zfill(6)}",
-                2: f"#{hex(mainColor - colorWeight*6)[2:].zfill(6)}",
-                3: f"#{hex(mainColor - colorWeight*5)[2:].zfill(6)}",
-                4: f"#{hex(mainColor - colorWeight*4)[2:].zfill(6)}",
-                5: f"#{hex(mainColor - colorWeight*3)[2:].zfill(6)}",
-                6: f"#{hex(mainColor - colorWeight*2)[2:].zfill(6)}",
-                7: f"#{hex(mainColor - colorWeight*1)[2:].zfill(6)}",
-                8: f"#{hex(mainColor - colorWeight*0)[2:].zfill(6)}",
+                n: f"#{hex(mainColor - colorWeight*(len(chess_piece.moves)-n))[2:].zfill(6)}"
+                for n in range(len(chess_piece.moves))
             },
-            dashes={0: "", 1: "", 2: "", 3: "", 4: "", 5: "", 6: "", 7: "", 8: ""},
+            dashes={n: "" for n in range(len(chess_piece.moves))},
             ax=axs[1],
         )
         heatmap_data = np.array(
             [
                 np.mean(i)
-                for i in k.model.predict(
+                for i in chess_piece.model.predict(
                     np.array(
                         [
                             r.state(np.array([row, col]))

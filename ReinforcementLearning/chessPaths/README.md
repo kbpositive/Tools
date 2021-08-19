@@ -5,3 +5,6 @@ King
 
 Knight
 ![](./Knight.gif?raw=true)
+
+Bishop
+![](./Bishop.gif?raw=true)
