@@ -212,19 +212,14 @@ class Queen(Piece):
 
 
 if __name__ == "__main__":
-    # chess_piece = King(np.array([0, 0]))
-    chess_piece = Bishop(np.array([0, 0]))
-    label = "Bishop"
+    chess_piece = Knight(np.array([0, 0]))
+    label = "Knight"
 
     r = Board(np.zeros((8, 8)) + 1.0 / len(chess_piece.moves))
-    r.rewards[-1][0] = 1.0
-    r.rewards[0][-1] = 1.0
-    r.rewards[0][0] = 0.0
-    r.rewards[-1][-1] = 0.0
-    r.rewards[3][3] = 1.0
-    r.rewards[4][4] = 1.0
-    r.rewards[3][4] = 0.0
-    r.rewards[4][3] = 0.0
+    r.rewards[0][0] = 1.0
+    r.rewards[7][7] = 1.0
+    r.rewards[7][0] = 0.0
+    r.rewards[0][7] = 0.0
 
     inp = np.array(
         [
@@ -240,7 +235,7 @@ if __name__ == "__main__":
                 r,
                 chess_piece.moves.values(),
                 np.array([row, col]),
-                1,
+                4,
             )
             for row in range(r.dims[0])
             for col in range(r.dims[1])
