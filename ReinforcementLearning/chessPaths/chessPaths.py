@@ -241,8 +241,8 @@ class Queen(Piece):
 
 
 if __name__ == "__main__":
-    chess_piece = Knight(np.array([0, 0]))
-    label = "Knight"
+    chess_piece = King(np.array([0, 0]))
+    label = "King"
     timesteps = 4
 
     r = Board(np.zeros((8, 8)))
@@ -283,25 +283,34 @@ if __name__ == "__main__":
             verbose=0,
         )
 
+        # plt 1
         result.append(history.history[[i for i in history.history.keys()][-1]])
-        sns.set(rc={"figure.figsize": (15, 6)})
+        sns.set(rc={"figure.figsize": (9, 3)})
+        sns.set_style("whitegrid")
         fig, axs = plt.subplots(ncols=3)
         mainColor = 0x8FCACA
-        colorWeight = 0x0000D0
+        colorWeight = 0x0000C0
         sns.lineplot(
             data=np.array(result),
-            color={0: f"#{hex(mainColor)[2:].zfill(6)}"},
+            color=f"#{hex(mainColor)[2:].zfill(6)}",
             ax=axs[0],
         )
+        axs[0].legend_.remove()
+        axs[0].set_title("Mean Absolute Error", fontsize=8)
+        plt.setp(axs[0].lines, linewidth=0.75)
+
+        # plt 2
         sns.lineplot(
             data=chess_piece.model.predict(inp),
-            palette={
-                n: f"#{hex(mainColor - colorWeight*(len(chess_piece.moves)-n))[2:].zfill(6)}"
-                for n in range(len(chess_piece.moves))
-            },
+            palette=sns.color_palette("Greens", len(chess_piece.moves)),
             dashes={n: "" for n in range(len(chess_piece.moves))},
             ax=axs[1],
         )
+        axs[1].legend_.remove()
+        axs[1].set_title("Policy value by board state", fontsize=8)
+        plt.setp(axs[1].lines, linewidth=0.75)
+
+        # plt 3
         heatmap_data = np.array(
             [
                 np.mean(i)
@@ -320,9 +329,9 @@ if __name__ == "__main__":
             data=heatmap_data,
             ax=axs[2],
             cbar=False,
-            # norm=LogNorm(),
             cmap=sns.light_palette("#957DAD", as_cmap=True, reverse=True),
         ).invert_yaxis()
+        axs[2].set_title("Mean value by board state", fontsize=8)
 
         files.append(f"./results/{epoch}.png")
         plt.savefig(files[-1])
