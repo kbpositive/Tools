@@ -154,10 +154,10 @@ class Knight(Piece):
 
         self.model = models.Sequential(
             [
-                layers.Dense(len(self.moves), input_shape=(64,), activation="sigmoid"),
+                layers.Dense(len(self.moves), input_shape=(64,), activation="tanh"),
             ]
         )
-        self.optimizer = optimizers.Adam(learning_rate=0.06)
+        self.optimizer = optimizers.Adam(learning_rate=0.025)
         self.model.compile(
             loss=self.reinforce,
             optimizer=self.optimizer,
@@ -177,10 +177,10 @@ class Bishop(Piece):
 
         self.model = models.Sequential(
             [
-                layers.Dense(len(self.moves), input_shape=(64,), activation="sigmoid"),
+                layers.Dense(len(self.moves), input_shape=(64,), activation="tanh"),
             ]
         )
-        self.optimizer = optimizers.Adam(learning_rate=0.06)
+        self.optimizer = optimizers.Adam(learning_rate=0.025)
         self.model.compile(
             loss=self.reinforce,
             optimizer=self.optimizer,
@@ -200,10 +200,10 @@ class Rook(Piece):
 
         self.model = models.Sequential(
             [
-                layers.Dense(len(self.moves), input_shape=(64,), activation="sigmoid"),
+                layers.Dense(len(self.moves), input_shape=(64,), activation="tanh"),
             ]
         )
-        self.optimizer = optimizers.Adam(learning_rate=0.06)
+        self.optimizer = optimizers.Adam(learning_rate=0.025)
         self.model.compile(
             loss=self.reinforce,
             optimizer=self.optimizer,
@@ -228,10 +228,10 @@ class Queen(Piece):
 
         self.model = models.Sequential(
             [
-                layers.Dense(len(self.moves), input_shape=(64,), activation="sigmoid"),
+                layers.Dense(len(self.moves), input_shape=(64,), activation="tanh"),
             ]
         )
-        self.optimizer = optimizers.Adam(learning_rate=0.06)
+        self.optimizer = optimizers.Adam(learning_rate=0.025)
         self.model.compile(
             loss=self.reinforce,
             optimizer=self.optimizer,
@@ -241,9 +241,9 @@ class Queen(Piece):
 
 
 if __name__ == "__main__":
-    chess_piece = King(np.array([0, 0]))
-    label = "King"
-    timesteps = 5
+    chess_piece = Knight(np.array([0, 0]))
+    label = "Knight"
+    timesteps = 4
 
     r = Board(np.zeros((8, 8)))
     r.rewards[6][6] = 1.0
