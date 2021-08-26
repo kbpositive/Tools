@@ -27,14 +27,19 @@ class Piece:
         self.discount = 0.95
 
     def reinforce(self, actual, pred):
-        return pred - actual * tf.math.log(pred)
+        return tf.math.sigmoid(pred) - tf.math.sigmoid(actual) * tf.math.log(
+            tf.math.sigmoid(pred)
+        )
 
     def rollout(self, board, moves, state, timesteps, depth=1):
         if (-1) >= timesteps:
             return 0
 
         policy = self.model(np.array([board.state(state)]))[0]
-        next_actions = random.sample(range(len(moves)), k=1) + [np.argmax(policy)]
+        next_actions = [np.argmax(policy)]
+        guesses = random.choices(
+            moves, k=1, weights=(policy ** (2.0)) * (np.abs(policy) / policy)
+        )
         if depth == 1:
             step = np.array(
                 [
@@ -50,29 +55,30 @@ class Piece:
                 ]
             )
             for n in next_actions:
-                step[n] += np.sum(
-                    [
-                        self.rollout(
-                            board,
-                            moves,
-                            np.array(
-                                state + moves[n]
-                                if (
-                                    0 <= (state + moves[n])[0] < board.dims[0]
-                                    and 0 <= (state + moves[n])[1] < board.dims[1]
-                                )
-                                else state
-                            ),
-                            timesteps - 1,
-                            depth + 1,
-                        )
-                    ]
+                step[n] += (
+                    np.sum(
+                        [
+                            self.rollout(
+                                board,
+                                moves,
+                                np.array(
+                                    state + guess
+                                    if (
+                                        0 <= (state + guess)[0] < board.dims[0]
+                                        and 0 <= (state + guess)[1] < board.dims[1]
+                                    )
+                                    else state
+                                ),
+                                timesteps - 1,
+                                depth + 1,
+                            )
+                            for guess in guesses
+                        ]
+                    )
+                    * self.discount ** depth
                 )
-                step[n] /= len(next_actions)
-                step[n] *= self.discount ** depth
             return step
 
-        guesses = [moves[n] for n in next_actions]
         return (
             np.sum(
                 [
@@ -101,7 +107,6 @@ class Piece:
                     for guess in guesses
                 ]
             )
-            / len(guesses)
         ) * (self.discount ** depth)
 
 
@@ -121,10 +126,10 @@ class King(Piece):
 
         self.model = models.Sequential(
             [
-                layers.Dense(len(self.moves), input_shape=(64,), activation="sigmoid"),
+                layers.Dense(len(self.moves), input_shape=(64,), activation="tanh"),
             ]
         )
-        self.optimizer = optimizers.Adam(learning_rate=0.06)
+        self.optimizer = optimizers.Adam(learning_rate=0.025)
         self.model.compile(
             loss=self.reinforce,
             optimizer=self.optimizer,
@@ -236,13 +241,13 @@ class Queen(Piece):
 
 
 if __name__ == "__main__":
-    chess_piece = Queen(np.array([0, 0]))
-    label = "Queen"
-    timesteps = 2
+    chess_piece = King(np.array([0, 0]))
+    label = "King"
+    timesteps = 5
 
-    r = Board(np.zeros((8, 8)) + 1.0 / len(chess_piece.moves))
+    r = Board(np.zeros((8, 8)))
     r.rewards[6][6] = 1.0
-    r.rewards[1][1] = 0.0
+    r.rewards[1][1] = -1.0
 
     inp = np.array(
         [
@@ -254,7 +259,7 @@ if __name__ == "__main__":
 
     result = []
     files = []
-    for epoch in range(100):
+    for epoch in range(150):
         out = (
             np.array(
                 [
