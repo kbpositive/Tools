@@ -241,8 +241,8 @@ class Queen(Piece):
 
 
 if __name__ == "__main__":
-    chess_piece = King(np.array([0, 0]))
-    label = "King"
+    chess_piece = Knight(np.array([0, 0]))
+    label = "Knight"
     timesteps = 4
 
     r = Board(np.zeros((8, 8)))
