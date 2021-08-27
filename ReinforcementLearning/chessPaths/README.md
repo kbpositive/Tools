@@ -1,16 +1,16 @@
-chess path prediction
+# Predicting chess paths to specific squares (with obstacles)
 
-King
+## King
 ![](./King.gif?raw=true)
-
-Knight
+___
+## Knight
 ![](./Knight.gif?raw=true)
-
-Bishop
+___
+## Bishop
 ![](./Bishop.gif?raw=true)
-
-Rook
+___
+## Rook
 ![](./Rook.gif?raw=true)
-
-Queen
+___
+## Queen
 ![](./Queen.gif?raw=true)
