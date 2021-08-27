@@ -38,8 +38,13 @@ class Piece:
         policy = self.model(np.array([board.state(state)]))[0]
         next_actions = [np.argmax(policy)]
         guesses = random.choices(
-            moves, k=1, weights=(policy ** (2.0)) * (np.abs(policy) / policy)
+            moves, k=1, weights=(policy ** (3.0)) * (np.abs(policy) / policy)
         )
+
+        if board.reward(state) == 1.0 or board.reward(state) == -1.0:
+            next_actions = [0]
+            guesses = [moves[0]]
+
         if depth == 1:
             step = np.array(
                 [
@@ -113,11 +118,11 @@ class Piece:
 class King(Piece):
     def __init__(self, rewards):
         self.moves = {
-            0: np.array([-1, -1]),
+            4: np.array([-1, -1]),
             1: np.array([-1, 0]),
             2: np.array([-1, 1]),
             3: np.array([0, -1]),
-            4: np.array([0, 0]),
+            0: np.array([0, 0]),
             5: np.array([0, 1]),
             6: np.array([1, -1]),
             7: np.array([1, 0]),
@@ -141,11 +146,11 @@ class King(Piece):
 class Knight(Piece):
     def __init__(self, rewards):
         self.moves = {
-            0: np.array([-2, -1]),
+            4: np.array([-2, -1]),
             1: np.array([-1, -2]),
             2: np.array([2, -1]),
             3: np.array([1, -2]),
-            4: np.array([0, 0]),
+            0: np.array([0, 0]),
             5: np.array([-2, 1]),
             6: np.array([-1, 2]),
             7: np.array([2, 1]),
@@ -241,15 +246,19 @@ class Queen(Piece):
 
 
 if __name__ == "__main__":
-    chess_piece = Rook(np.array([0, 0]))
-    label = "Rook"
-    timesteps = 4
+    chess_piece = King(np.array([0, 0]))
+    label = "King"
+    timesteps = 6
 
     r = Board(np.zeros((8, 8)))
-    r.rewards[6][6] = 1.0
-    r.rewards[1][6] = -1.0
-    r.rewards[6][1] = -1.0
     r.rewards[1][1] = 1.0
+    r.rewards[2][2] = -1.0
+    r.rewards[1][2] = -1.0
+    r.rewards[2][1] = -1.0
+    r.rewards[6][6] = 1.0
+    r.rewards[5][5] = -1.0
+    r.rewards[6][5] = -1.0
+    r.rewards[5][6] = -1.0
 
     inp = np.array(
         [
@@ -267,7 +276,7 @@ if __name__ == "__main__":
                 [
                     chess_piece.rollout(
                         r,
-                        list(chess_piece.moves.values()),
+                        [chess_piece.moves[n] for n in range(len(chess_piece.moves))],
                         np.array([row, col]),
                         timesteps,
                     )
@@ -290,21 +299,18 @@ if __name__ == "__main__":
         sns.set(rc={"figure.figsize": (9, 3)})
         sns.set_style("whitegrid")
         fig, axs = plt.subplots(ncols=3)
-        mainColor = 0x8FCACA
-        colorWeight = 0x0000C0
         sns.lineplot(
             data=np.array(result),
-            color=f"#{hex(mainColor)[2:].zfill(6)}",
             ax=axs[0],
         )
         axs[0].legend_.remove()
         axs[0].set_title("Mean Absolute Error", fontsize=8)
-        plt.setp(axs[0].lines, linewidth=0.75)
+        plt.setp(axs[0].lines, color="#699CB3", linewidth=0.75)
 
         # plt 2
         sns.lineplot(
             data=chess_piece.model.predict(inp),
-            palette=sns.color_palette("Greens", len(chess_piece.moves)),
+            palette=sns.color_palette(f"dark:#347893_r", len(chess_piece.moves)),
             dashes={n: "" for n in range(len(chess_piece.moves))},
             ax=axs[1],
         )
@@ -331,7 +337,7 @@ if __name__ == "__main__":
             data=heatmap_data,
             ax=axs[2],
             cbar=False,
-            cmap=sns.light_palette("#957DAD", as_cmap=True, reverse=True),
+            cmap=sns.light_palette("#205565", as_cmap=True, reverse=True),
         ).invert_yaxis()
         axs[2].set_title("Mean value by board state", fontsize=8)
 
