@@ -22,28 +22,72 @@ class Board:
 
 
 class Piece:
-    def __init__(self, pos):
-        self.pos = pos
+    def __init__(self, moves):
         self.discount = 0.95
+        self.moves = self.makeMoves(moves)
+        self.model = self.makeNet(len(self.moves))
+
+    def makeMoves(self, initMoves):
+        moves = [[0, 0]]
+        for _ in range(4):
+            for index, [row, col] in enumerate(initMoves):
+                moves.append([row, col])
+                initMoves[index][0], initMoves[index][1] = (
+                    initMoves[index][1],
+                    -initMoves[index][0],
+                )
+        return moves
+
+    def makeNet(self, length):
+        model = models.Sequential(
+            [
+                layers.Dense(length, input_shape=(64,), activation="tanh"),
+            ]
+        )
+        optimizer = optimizers.Adam(learning_rate=0.0375)
+        model.compile(
+            loss=self.reinforce,
+            optimizer=optimizer,
+            metrics=tf.keras.metrics.MeanAbsoluteError(),
+        )
+        return model
 
     def reinforce(self, actual, pred):
-        return tf.math.sigmoid(pred) - tf.math.sigmoid(actual) * tf.math.log(
-            tf.math.sigmoid(pred)
-        )
+        pShift = lambda x: (x + 1.0) / 2.0
+        return pShift(pred) - pShift(actual) * tf.math.log(pShift(pred))
 
     def rollout(self, board, moves, state, timesteps, depth=1):
         if (-1) >= timesteps:
             return 0
 
-        policy = self.model(np.array([board.state(state)]))[0]
-        next_actions = [np.argmax(policy)]
-        guesses = random.choices(
-            moves, k=1, weights=(policy ** (3.0)) * (np.abs(policy) / policy)
-        )
+        policy = lambda x: self.model(np.array([board.state(x)]))[0]
+        p = policy(state)
 
+        def nextMove(s=state, x=[0, 0]):
+            sp = s + moves[np.argmax(policy(s + x))]
+            return (
+                sp
+                if (0 <= (sp)[0] < board.dims[0] and 0 <= (sp)[1] < board.dims[1])
+                else s
+            )
+
+        w = [state]
+
+        for _ in range(0):
+            w.append(nextMove(w[-1]))
+
+        pShift = lambda x: np.array(x + np.abs(np.min(x)))
+
+        pDist = np.ones((len(moves)))
+
+        for dist in w:
+            pDist *= pShift(policy(dist)) ** (timesteps + depth)
+
+        next_action = np.argmax(p)
+        guess = random.choices(moves, k=1, weights=pDist)[0]
         if board.reward(state) == 1.0 or board.reward(state) == -1.0:
-            next_actions = [0]
-            guesses = [moves[0]]
+            next_action = 0
+            guess = moves[0]
 
         if depth == 1:
             step = np.array(
@@ -59,196 +103,84 @@ class Piece:
                     for action in moves
                 ]
             )
-            for n in next_actions:
-                step[n] += (
-                    np.sum(
-                        [
-                            self.rollout(
-                                board,
-                                moves,
-                                np.array(
-                                    state + guess
-                                    if (
-                                        0 <= (state + guess)[0] < board.dims[0]
-                                        and 0 <= (state + guess)[1] < board.dims[1]
-                                    )
-                                    else state
-                                ),
-                                timesteps - 1,
-                                depth + 1,
-                            )
-                            for guess in guesses
-                        ]
-                    )
-                    * self.discount ** depth
-                )
-            return step
-
-        return (
-            np.sum(
-                [
-                    board.reward(
+            r = (
+                self.rollout(
+                    board,
+                    moves,
+                    np.array(
                         state + guess
                         if (
                             0 <= (state + guess)[0] < board.dims[0]
                             and 0 <= (state + guess)[1] < board.dims[1]
                         )
                         else state
+                    ),
+                    timesteps - 1,
+                    depth + 1,
+                )
+            ) * self.discount ** depth
+
+            step[next_action] += r
+
+            return step
+
+        return (
+            board.reward(
+                state + guess
+                if (
+                    0 <= (state + guess)[0] < board.dims[0]
+                    and 0 <= (state + guess)[1] < board.dims[1]
+                )
+                else state
+            )
+            + self.rollout(
+                board,
+                moves,
+                np.array(
+                    state + guess
+                    if (
+                        0 <= (state + guess)[0] < board.dims[0]
+                        and 0 <= (state + guess)[1] < board.dims[1]
                     )
-                    + self.rollout(
-                        board,
-                        moves,
-                        np.array(
-                            state + guess
-                            if (
-                                0 <= (state + guess)[0] < board.dims[0]
-                                and 0 <= (state + guess)[1] < board.dims[1]
-                            )
-                            else state
-                        ),
-                        timesteps - 1,
-                        depth + 1,
-                    )
-                    for guess in guesses
-                ]
+                    else state
+                ),
+                timesteps - 1,
+                depth + 1,
             )
         ) * (self.discount ** depth)
 
 
 class King(Piece):
-    def __init__(self, rewards):
-        self.moves = {
-            4: np.array([-1, -1]),
-            1: np.array([-1, 0]),
-            2: np.array([-1, 1]),
-            3: np.array([0, -1]),
-            0: np.array([0, 0]),
-            5: np.array([0, 1]),
-            6: np.array([1, -1]),
-            7: np.array([1, 0]),
-            8: np.array([1, 1]),
-        }
-
-        self.model = models.Sequential(
-            [
-                layers.Dense(len(self.moves), input_shape=(64,), activation="tanh"),
-            ]
-        )
-        self.optimizer = optimizers.Adam(learning_rate=0.025)
-        self.model.compile(
-            loss=self.reinforce,
-            optimizer=self.optimizer,
-            metrics=tf.keras.metrics.MeanAbsoluteError(),
-        )
-        super(King, self).__init__(rewards)
+    def __init__(self):
+        super().__init__([[0, -1], [-1, -1]])
 
 
 class Knight(Piece):
-    def __init__(self, rewards):
-        self.moves = {
-            4: np.array([-2, -1]),
-            1: np.array([-1, -2]),
-            2: np.array([2, -1]),
-            3: np.array([1, -2]),
-            0: np.array([0, 0]),
-            5: np.array([-2, 1]),
-            6: np.array([-1, 2]),
-            7: np.array([2, 1]),
-            8: np.array([1, 2]),
-        }
-
-        self.model = models.Sequential(
-            [
-                layers.Dense(len(self.moves), input_shape=(64,), activation="tanh"),
-            ]
-        )
-        self.optimizer = optimizers.Adam(learning_rate=0.025)
-        self.model.compile(
-            loss=self.reinforce,
-            optimizer=self.optimizer,
-            metrics=tf.keras.metrics.MeanAbsoluteError(),
-        )
-        super(Knight, self).__init__(rewards)
+    def __init__(self):
+        super().__init__([[-1, -2], [-2, -1]])
 
 
 class Bishop(Piece):
-    def __init__(self, rewards):
-        self.moves = {0: np.array([0, 0])}
-        for i in range(1, 8):
-            self.moves[i] = np.array([i, i])
-            self.moves[i + 7] = np.array([-i, -i])
-            self.moves[i + 14] = np.array([i, -i])
-            self.moves[i + 21] = np.array([-i, i])
-
-        self.model = models.Sequential(
-            [
-                layers.Dense(len(self.moves), input_shape=(64,), activation="tanh"),
-            ]
-        )
-        self.optimizer = optimizers.Adam(learning_rate=0.025)
-        self.model.compile(
-            loss=self.reinforce,
-            optimizer=self.optimizer,
-            metrics=tf.keras.metrics.MeanAbsoluteError(),
-        )
-        super(Bishop, self).__init__(rewards)
+    def __init__(self):
+        super().__init__([[-n, -n] for n in range(1, 8)])
 
 
 class Rook(Piece):
-    def __init__(self, rewards):
-        self.moves = {0: np.array([0, 0])}
-        for i in range(1, 8):
-            self.moves[i] = np.array([i, 0])
-            self.moves[i + 7] = np.array([-i, 0])
-            self.moves[i + 14] = np.array([0, -i])
-            self.moves[i + 21] = np.array([0, i])
-
-        self.model = models.Sequential(
-            [
-                layers.Dense(len(self.moves), input_shape=(64,), activation="tanh"),
-            ]
-        )
-        self.optimizer = optimizers.Adam(learning_rate=0.025)
-        self.model.compile(
-            loss=self.reinforce,
-            optimizer=self.optimizer,
-            metrics=tf.keras.metrics.MeanAbsoluteError(),
-        )
-        super(Rook, self).__init__(rewards)
+    def __init__(self):
+        super().__init__([[-n, 0] for n in range(1, 8)])
 
 
 class Queen(Piece):
-    def __init__(self, rewards):
-        self.moves = {0: np.array([0, 0])}
-        for i in range(1, 8):
-            self.moves[i] = np.array([i, 0])
-            self.moves[i + 7] = np.array([-i, 0])
-            self.moves[i + 14] = np.array([0, -i])
-            self.moves[i + 21] = np.array([0, i])
-        for i in range(1, 8):
-            self.moves[i + 28] = np.array([i, i])
-            self.moves[i + 35] = np.array([-i, -i])
-            self.moves[i + 42] = np.array([i, -i])
-            self.moves[i + 49] = np.array([-i, i])
-
-        self.model = models.Sequential(
-            [
-                layers.Dense(len(self.moves), input_shape=(64,), activation="tanh"),
-            ]
+    def __init__(self):
+        super().__init__(
+            [[-n, -n] for n in range(1, 8)] + [[-n, 0] for n in range(1, 8)]
         )
-        self.optimizer = optimizers.Adam(learning_rate=0.025)
-        self.model.compile(
-            loss=self.reinforce,
-            optimizer=self.optimizer,
-            metrics=tf.keras.metrics.MeanAbsoluteError(),
-        )
-        super(Queen, self).__init__(rewards)
 
 
 if __name__ == "__main__":
-    chess_piece = King(np.array([0, 0]))
-    label = "King"
-    timesteps = 6
+    chess_piece = Queen()
+    label = "Queen"
+    timesteps = 3
 
     r = Board(np.zeros((8, 8)))
     r.rewards[1][1] = 1.0
@@ -293,9 +225,9 @@ if __name__ == "__main__":
             epochs=1,
             verbose=0,
         )
+        result.append(history.history[[i for i in history.history.keys()][-1]])
 
         # plt 1
-        result.append(history.history[[i for i in history.history.keys()][-1]])
         sns.set(rc={"figure.figsize": (9, 3)})
         sns.set_style("whitegrid")
         fig, axs = plt.subplots(ncols=3)
