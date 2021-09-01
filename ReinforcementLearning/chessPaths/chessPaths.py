@@ -76,9 +76,6 @@ class Piece:
         if (-1) >= timesteps:
             return 0
 
-        def nextMove(s=state, x=[0, 0]):
-            return board.valid_move(s, moves[np.argmax(policy(s + x))])
-
         def state_rollout(state):
             states = [state]
             for _ in range(timesteps):
@@ -94,33 +91,30 @@ class Piece:
             return pDist
 
         policy = lambda x: self.model(np.array([board.state(x)]))[0]
-        p = policy(state)
         states = state_rollout(state)
 
-        next_action = np.argmax(p)
+        next_action = np.argmax(policy(state))
         guess = random.choices(moves, k=1, weights=state_shift(states))[0]
         if board.reward(state) == 1.0 or board.reward(state) == -1.0:
             next_action = 0
             guess = moves[0]
 
         if depth == 1:
-            return np.array(
-                [
-                    board.reward(board.valid_move(state, action))
-                    if (index != next_action)
-                    else board.reward(board.valid_move(state, action))
-                    + (
-                        self.rollout(
-                            board,
-                            moves,
-                            np.array(board.valid_move(state, guess)),
-                            timesteps - 1,
-                            depth + 1,
-                        )
+            return (
+                np.array(
+                    [board.reward(board.valid_move(state, action)) for action in moves]
+                )
+                + (
+                    np.eye(len(moves))[next_action]
+                    * self.rollout(
+                        board,
+                        moves,
+                        np.array(board.valid_move(state, guess)),
+                        timesteps - 1,
+                        depth + 1,
                     )
-                    * self.discount ** depth
-                    for index, action in enumerate(moves)
-                ]
+                )
+                * (self.discount ** depth)
             )
 
         return (
