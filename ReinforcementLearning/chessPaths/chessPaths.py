@@ -44,7 +44,7 @@ class Piece:
                 layers.Dense(length, input_shape=(64,), activation="tanh"),
             ]
         )
-        optimizer = optimizers.Adam(learning_rate=0.0375)
+        optimizer = optimizers.Adam(learning_rate=0.0275)
         model.compile(
             loss=self.reinforce,
             optimizer=optimizer,
@@ -153,21 +153,25 @@ class Piece:
 class King(Piece):
     def __init__(self):
         super().__init__([[0, -1], [-1, -1]])
+        self.label = "King"
 
 
 class Knight(Piece):
     def __init__(self):
         super().__init__([[-1, -2], [-2, -1]])
+        self.label = "Knight"
 
 
 class Bishop(Piece):
     def __init__(self):
         super().__init__([[-n, -n] for n in range(1, 8)])
+        self.label = "Bishop"
 
 
 class Rook(Piece):
     def __init__(self):
         super().__init__([[-n, 0] for n in range(1, 8)])
+        self.label = "Rook"
 
 
 class Queen(Piece):
@@ -175,6 +179,7 @@ class Queen(Piece):
         super().__init__(
             [[-n, -n] for n in range(1, 8)] + [[-n, 0] for n in range(1, 8)]
         )
+        self.label = "Queen"
 
 
 def render(board, piece, result, epoch):
@@ -242,10 +247,42 @@ def saveGif(label, files):
         os.remove(file)
 
 
+def training_loop(board, inputs, piece, loops, timesteps):
+    result = []
+    files = []
+    for epoch in range(loops):
+        out = (
+            np.array(
+                [
+                    piece.rollout(
+                        board,
+                        [piece.moves[n] for n in range(len(piece.moves))],
+                        np.array([row, col]),
+                        timesteps,
+                    )
+                    for row in range(board.dims[0])
+                    for col in range(board.dims[1])
+                ]
+            )
+            / max(1, timesteps)
+        )
+
+        history = piece.model.fit(
+            inp,
+            out,
+            epochs=1,
+            verbose=0,
+        )
+
+        result.append(history.history[[i for i in history.history.keys()][-1]])
+
+        files.append(render(r, piece, result, epoch))
+
+    saveGif(piece.label, files)
+
+
 if __name__ == "__main__":
     chess_piece = King()
-    label = "King"
-    timesteps = 3
 
     r = Board(np.zeros((8, 8)))
     r.rewards[1][1] = 1.0
@@ -264,35 +301,4 @@ if __name__ == "__main__":
             for col in range(r.dims[1])
         ]
     )
-
-    result = []
-    files = []
-    for epoch in range(150):
-        out = (
-            np.array(
-                [
-                    chess_piece.rollout(
-                        r,
-                        [chess_piece.moves[n] for n in range(len(chess_piece.moves))],
-                        np.array([row, col]),
-                        timesteps,
-                    )
-                    for row in range(r.dims[0])
-                    for col in range(r.dims[1])
-                ]
-            )
-            / max(1, timesteps)
-        )
-
-        history = chess_piece.model.fit(
-            inp,
-            out,
-            epochs=1,
-            verbose=0,
-        )
-
-        result.append(history.history[[i for i in history.history.keys()][-1]])
-
-        files.append(render(r, chess_piece, result, epoch))
-
-    saveGif(label, files)
+    training_loop(r, inp, chess_piece, 150, 3)
