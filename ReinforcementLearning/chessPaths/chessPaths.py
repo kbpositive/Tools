@@ -177,9 +177,74 @@ class Queen(Piece):
         )
 
 
+def render(board, piece, result, epoch):
+    # plt 1
+    sns.set(rc={"figure.figsize": (9, 3)})
+    sns.set_style("whitegrid")
+    _, axs = plt.subplots(ncols=3)
+    sns.lineplot(
+        data=np.array(result),
+        ax=axs[0],
+    )
+    axs[0].legend_.remove()
+    axs[0].set_title("Mean Absolute Error", fontsize=8)
+    plt.setp(axs[0].lines, color="#699CB3", linewidth=0.75)
+
+    # plt 2
+    sns.lineplot(
+        data=piece.model.predict(inp),
+        palette=sns.color_palette(f"dark:#347893_r", len(piece.moves)),
+        dashes={n: "" for n in range(len(piece.moves))},
+        ax=axs[1],
+    )
+    axs[1].legend_.remove()
+    axs[1].set_title("Policy value by board state", fontsize=8)
+    plt.setp(axs[1].lines, linewidth=0.75)
+
+    # plt 3
+    heatmap_data = np.array(
+        [
+            np.mean(i)
+            for i in piece.model.predict(
+                np.array(
+                    [
+                        board.state(np.array([row, col]))
+                        for col in range(board.dims[1])
+                        for row in range(board.dims[0])
+                    ]
+                )
+            )
+        ]
+    ).reshape((8, 8))
+    sns.heatmap(
+        data=heatmap_data,
+        ax=axs[2],
+        cbar=False,
+        cmap=sns.light_palette("#205565", as_cmap=True, reverse=True),
+    ).invert_yaxis()
+    axs[2].set_title("Mean value by board state", fontsize=8)
+
+    plt.savefig(f"./results/{epoch}.png")
+    plt.close()
+    return f"./results/{epoch}.png"
+
+
+def saveGif(label, files):
+    with imageio.get_writer(f"./{label}.gif", mode="I") as writer:
+        for file in files:
+            image = imageio.imread(file)
+            writer.append_data(image)
+        for _ in range(36):
+            image = imageio.imread(files[-1])
+            writer.append_data(image)
+
+    for file in set(files):
+        os.remove(file)
+
+
 if __name__ == "__main__":
-    chess_piece = Queen()
-    label = "Queen"
+    chess_piece = King()
+    label = "King"
     timesteps = 3
 
     r = Board(np.zeros((8, 8)))
@@ -225,65 +290,9 @@ if __name__ == "__main__":
             epochs=1,
             verbose=0,
         )
+
         result.append(history.history[[i for i in history.history.keys()][-1]])
 
-        # plt 1
-        sns.set(rc={"figure.figsize": (9, 3)})
-        sns.set_style("whitegrid")
-        fig, axs = plt.subplots(ncols=3)
-        sns.lineplot(
-            data=np.array(result),
-            ax=axs[0],
-        )
-        axs[0].legend_.remove()
-        axs[0].set_title("Mean Absolute Error", fontsize=8)
-        plt.setp(axs[0].lines, color="#699CB3", linewidth=0.75)
+        files.append(render(r, chess_piece, result, epoch))
 
-        # plt 2
-        sns.lineplot(
-            data=chess_piece.model.predict(inp),
-            palette=sns.color_palette(f"dark:#347893_r", len(chess_piece.moves)),
-            dashes={n: "" for n in range(len(chess_piece.moves))},
-            ax=axs[1],
-        )
-        axs[1].legend_.remove()
-        axs[1].set_title("Policy value by board state", fontsize=8)
-        plt.setp(axs[1].lines, linewidth=0.75)
-
-        # plt 3
-        heatmap_data = np.array(
-            [
-                np.mean(i)
-                for i in chess_piece.model.predict(
-                    np.array(
-                        [
-                            r.state(np.array([row, col]))
-                            for col in range(r.dims[1])
-                            for row in range(r.dims[0])
-                        ]
-                    )
-                )
-            ]
-        ).reshape((8, 8))
-        sns.heatmap(
-            data=heatmap_data,
-            ax=axs[2],
-            cbar=False,
-            cmap=sns.light_palette("#205565", as_cmap=True, reverse=True),
-        ).invert_yaxis()
-        axs[2].set_title("Mean value by board state", fontsize=8)
-
-        files.append(f"./results/{epoch}.png")
-        plt.savefig(files[-1])
-        plt.close()
-
-    with imageio.get_writer(f"./{label}.gif", mode="I") as writer:
-        for file in files:
-            image = imageio.imread(file)
-            writer.append_data(image)
-        for _ in range(36):
-            image = imageio.imread(files[-1])
-            writer.append_data(image)
-
-    for file in set(files):
-        os.remove(file)
+    saveGif(label, files)
