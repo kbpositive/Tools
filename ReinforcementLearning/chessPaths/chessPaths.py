@@ -100,30 +100,13 @@ class Piece:
 
         if depth == 1:
             step = np.array(
-                [
-                    board.reward(
-                        state + action
-                        if (
-                            0 <= (state + action)[0] < board.dims[0]
-                            and 0 <= (state + action)[1] < board.dims[1]
-                        )
-                        else state
-                    )
-                    for action in moves
-                ]
+                [board.reward(board.valid_move(state, action)) for action in moves]
             )
             r = (
                 self.rollout(
                     board,
                     moves,
-                    np.array(
-                        state + guess
-                        if (
-                            0 <= (state + guess)[0] < board.dims[0]
-                            and 0 <= (state + guess)[1] < board.dims[1]
-                        )
-                        else state
-                    ),
+                    np.array(board.valid_move(state, guess)),
                     timesteps - 1,
                     depth + 1,
                 )
@@ -134,25 +117,11 @@ class Piece:
             return step
 
         return (
-            board.reward(
-                state + guess
-                if (
-                    0 <= (state + guess)[0] < board.dims[0]
-                    and 0 <= (state + guess)[1] < board.dims[1]
-                )
-                else state
-            )
+            board.reward(board.valid_move(state, guess))
             + self.rollout(
                 board,
                 moves,
-                np.array(
-                    state + guess
-                    if (
-                        0 <= (state + guess)[0] < board.dims[0]
-                        and 0 <= (state + guess)[1] < board.dims[1]
-                    )
-                    else state
-                ),
+                np.array(board.valid_move(state, guess)),
                 timesteps - 1,
                 depth + 1,
             )
