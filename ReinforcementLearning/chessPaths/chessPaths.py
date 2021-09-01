@@ -82,7 +82,8 @@ class Piece:
         def state_rollout(state):
             states = [state]
             for _ in range(timesteps):
-                states.append(nextMove(states[-1]))
+                move = moves[np.argmax(policy(states[-1]))]
+                states.append(board.valid_move(states[-1], move))
             return states
 
         def state_shift(states):
@@ -103,7 +104,7 @@ class Piece:
             guess = moves[0]
 
         if depth == 1:
-            step = np.array(
+            return np.array(
                 [
                     board.reward(board.valid_move(state, action))
                     if (index != next_action)
@@ -121,8 +122,6 @@ class Piece:
                     for index, action in enumerate(moves)
                 ]
             )
-
-            return step
 
         return (
             board.reward(board.valid_move(state, guess))
