@@ -76,9 +76,6 @@ class Piece:
         if (-1) >= timesteps:
             return 0
 
-        policy = lambda x: self.model(np.array([board.state(x)]))[0]
-        p = policy(state)
-
         def nextMove(s=state, x=[0, 0]):
             return board.valid_move(s, moves[np.argmax(policy(s + x))])
 
@@ -88,34 +85,42 @@ class Piece:
                 states.append(nextMove(states[-1]))
             return states
 
+        def state_shift(states):
+            pShift = lambda x: np.array(x + np.abs(np.min(x)))
+            pDist = np.ones((len(moves)))
+            for dist in states:
+                pDist *= pShift(policy(dist)) ** (timesteps + depth)
+            return pDist
+
+        policy = lambda x: self.model(np.array([board.state(x)]))[0]
+        p = policy(state)
         states = state_rollout(state)
 
-        pShift = lambda x: np.array(x + np.abs(np.min(x)))
-        pDist = np.ones((len(moves)))
-        for dist in states:
-            pDist *= pShift(policy(dist)) ** (timesteps + depth)
-
         next_action = np.argmax(p)
-        guess = random.choices(moves, k=1, weights=pDist)[0]
+        guess = random.choices(moves, k=1, weights=state_shift(states))[0]
         if board.reward(state) == 1.0 or board.reward(state) == -1.0:
             next_action = 0
             guess = moves[0]
 
         if depth == 1:
             step = np.array(
-                [board.reward(board.valid_move(state, action)) for action in moves]
+                [
+                    board.reward(board.valid_move(state, action))
+                    if (index != next_action)
+                    else board.reward(board.valid_move(state, action))
+                    + (
+                        self.rollout(
+                            board,
+                            moves,
+                            np.array(board.valid_move(state, guess)),
+                            timesteps - 1,
+                            depth + 1,
+                        )
+                    )
+                    * self.discount ** depth
+                    for index, action in enumerate(moves)
+                ]
             )
-            r = (
-                self.rollout(
-                    board,
-                    moves,
-                    np.array(board.valid_move(state, guess)),
-                    timesteps - 1,
-                    depth + 1,
-                )
-            ) * self.discount ** depth
-
-            step[next_action] += r
 
             return step
 
