@@ -76,57 +76,37 @@ class Piece:
         if (-1) >= timesteps:
             return 0
 
-        def state_rollout(state):
-            states = [state]
-            for _ in range(timesteps):
-                move = moves[np.argmax(policy(states[-1]))]
-                states.append(board.valid_move(states[-1], move))
-            return states
-
-        def state_shift(states):
-            pShift = lambda x: np.array(x + np.abs(np.min(x)))
-            pDist = np.ones((len(moves)))
-            for dist in states:
-                pDist *= pShift(policy(dist)) ** (timesteps + depth)
-            return pDist
-
         policy = lambda x: self.model(np.array([board.state(x)]))[0]
-        states = state_rollout(state)
+        action = policy(state)
+        state_shift = np.array(action + np.abs(np.min(action))) ** (
+            timesteps + depth - 1
+        )
 
         next_action = np.argmax(policy(state))
-        guess = random.choices(moves, k=1, weights=state_shift(states))[0]
+        guess = random.choices(moves, k=1, weights=state_shift)[0]
         if board.reward(state) == 1.0 or board.reward(state) == -1.0:
             next_action = 0
             guess = moves[0]
 
-        if depth == 1:
-            return (
-                np.array(
-                    [board.reward(board.valid_move(state, action)) for action in moves]
-                )
-                + (
-                    np.eye(len(moves))[next_action]
-                    * self.rollout(
-                        board,
-                        moves,
-                        np.array(board.valid_move(state, guess)),
-                        timesteps - 1,
-                        depth + 1,
-                    )
-                )
-                * (self.discount ** depth)
-            )
-
-        return (
-            board.reward(board.valid_move(state, guess))
-            + self.rollout(
+        acc_rewards = (
+            self.rollout(
                 board,
                 moves,
                 np.array(board.valid_move(state, guess)),
                 timesteps - 1,
                 depth + 1,
             )
-        ) * (self.discount ** depth)
+            * (self.discount ** depth)
+        )
+
+        return (
+            np.array(
+                [board.reward(board.valid_move(state, action)) for action in moves]
+            )
+            + (np.eye(len(moves))[next_action] * acc_rewards)
+            if depth == 1
+            else board.reward(board.valid_move(state, guess)) + acc_rewards
+        )
 
 
 class King(Piece):
@@ -264,4 +244,4 @@ def make_board(rows, cols):
 
 if __name__ == "__main__":
     board = make_board(8, 8)
-    training_loop(board, King(), 150, 4)
+    training_loop(board, King(), 150, 8)
