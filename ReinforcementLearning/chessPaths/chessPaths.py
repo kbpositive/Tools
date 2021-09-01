@@ -29,6 +29,13 @@ class Board:
             ]
         )
 
+    def valid_move(self, x, h):
+        return (
+            x + h
+            if (0 <= (x + h)[0] < self.dims[0] and 0 <= (x + h)[1] < self.dims[1])
+            else x
+        )
+
 
 class Piece:
     def __init__(self, moves):
@@ -53,7 +60,7 @@ class Piece:
                 layers.Dense(length, input_shape=(64,), activation="tanh"),
             ]
         )
-        optimizer = optimizers.Adam(learning_rate=0.0275)
+        optimizer = optimizers.Adam(learning_rate=0.0375)
         model.compile(
             loss=self.reinforce,
             optimizer=optimizer,
@@ -73,12 +80,7 @@ class Piece:
         p = policy(state)
 
         def nextMove(s=state, x=[0, 0]):
-            sp = s + moves[np.argmax(policy(s + x))]
-            return (
-                sp
-                if (0 <= (sp)[0] < board.dims[0] and 0 <= (sp)[1] < board.dims[1])
-                else s
-            )
+            return board.valid_move(s, moves[np.argmax(policy(s + x))])
 
         w = [state]
 
@@ -86,9 +88,7 @@ class Piece:
             w.append(nextMove(w[-1]))
 
         pShift = lambda x: np.array(x + np.abs(np.min(x)))
-
         pDist = np.ones((len(moves)))
-
         for dist in w:
             pDist *= pShift(policy(dist)) ** (timesteps + depth)
 
@@ -294,4 +294,4 @@ def make_board(rows, cols):
 
 if __name__ == "__main__":
     board = make_board(8, 8)
-    training_loop(board, Bishop(), 500, 4)
+    training_loop(board, King(), 150, 4)
