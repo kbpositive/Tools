@@ -20,6 +20,15 @@ class Board:
     def reward(self, pos):
         return self.rewards[pos[0]][pos[1]]
 
+    def get_states(self):
+        return np.array(
+            [
+                self.state(np.array([row, col]))
+                for row in range(self.dims[0])
+                for col in range(self.dims[1])
+            ]
+        )
+
 
 class Piece:
     def __init__(self, moves):
@@ -197,7 +206,7 @@ def render(board, piece, result, epoch):
 
     # plt 2
     sns.lineplot(
-        data=piece.model.predict(inp),
+        data=piece.model.predict(board.get_states()),
         palette=sns.color_palette(f"dark:#347893_r", len(piece.moves)),
         dashes={n: "" for n in range(len(piece.moves))},
         ax=axs[1],
@@ -208,18 +217,7 @@ def render(board, piece, result, epoch):
 
     # plt 3
     heatmap_data = np.array(
-        [
-            np.mean(i)
-            for i in piece.model.predict(
-                np.array(
-                    [
-                        board.state(np.array([row, col]))
-                        for col in range(board.dims[1])
-                        for row in range(board.dims[0])
-                    ]
-                )
-            )
-        ]
+        [np.mean(i) for i in piece.model.predict(board.get_states())]
     ).reshape((8, 8))
     sns.heatmap(
         data=heatmap_data,
@@ -247,7 +245,7 @@ def saveGif(label, files):
         os.remove(file)
 
 
-def training_loop(board, inputs, piece, loops, timesteps):
+def training_loop(board, piece, loops, timesteps):
     result = []
     files = []
     for epoch in range(loops):
@@ -268,7 +266,7 @@ def training_loop(board, inputs, piece, loops, timesteps):
         )
 
         history = piece.model.fit(
-            inp,
+            board.get_states(),
             out,
             epochs=1,
             verbose=0,
@@ -276,29 +274,24 @@ def training_loop(board, inputs, piece, loops, timesteps):
 
         result.append(history.history[[i for i in history.history.keys()][-1]])
 
-        files.append(render(r, piece, result, epoch))
+        files.append(render(board, piece, result, epoch))
 
     saveGif(piece.label, files)
 
 
+def make_board(rows, cols):
+    board = Board(np.zeros((rows, cols)))
+    board.rewards[1][1] = 1.0
+    board.rewards[2][2] = -1.0
+    board.rewards[1][2] = -1.0
+    board.rewards[2][1] = -1.0
+    board.rewards[6][6] = 1.0
+    board.rewards[5][5] = -1.0
+    board.rewards[6][5] = -1.0
+    board.rewards[5][6] = -1.0
+    return board
+
+
 if __name__ == "__main__":
-    chess_piece = King()
-
-    r = Board(np.zeros((8, 8)))
-    r.rewards[1][1] = 1.0
-    r.rewards[2][2] = -1.0
-    r.rewards[1][2] = -1.0
-    r.rewards[2][1] = -1.0
-    r.rewards[6][6] = 1.0
-    r.rewards[5][5] = -1.0
-    r.rewards[6][5] = -1.0
-    r.rewards[5][6] = -1.0
-
-    inp = np.array(
-        [
-            r.state(np.array([row, col]))
-            for row in range(r.dims[0])
-            for col in range(r.dims[1])
-        ]
-    )
-    training_loop(r, inp, chess_piece, 150, 3)
+    board = make_board(8, 8)
+    training_loop(board, Bishop(), 500, 4)
