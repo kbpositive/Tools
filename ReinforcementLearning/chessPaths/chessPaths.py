@@ -82,14 +82,17 @@ class Piece:
         def nextMove(s=state, x=[0, 0]):
             return board.valid_move(s, moves[np.argmax(policy(s + x))])
 
-        w = [state]
+        def state_rollout(state):
+            states = [state]
+            for _ in range(timesteps):
+                states.append(nextMove(states[-1]))
+            return states
 
-        for _ in range(0):
-            w.append(nextMove(w[-1]))
+        states = state_rollout(state)
 
         pShift = lambda x: np.array(x + np.abs(np.min(x)))
         pDist = np.ones((len(moves)))
-        for dist in w:
+        for dist in states:
             pDist *= pShift(policy(dist)) ** (timesteps + depth)
 
         next_action = np.argmax(p)
