@@ -2,6 +2,19 @@ import unittest
 import linked
 
 class TestLinkedList(unittest.TestCase):
+    # test insert at index
+    def test_insert_at_index():
+        pass
+    # test insert at item
+    def test_insert_at_item():
+        pass
+    # test remove at index
+    def test_remove_at_index():
+        pass
+    # test remove at item
+    def test_remove_at_item():
+        pass
+    
     L = linked.LinkedList()
     items = [3, 2, 1, 9, 8, 7, 6, 5, 4, 0]
 
