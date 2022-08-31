@@ -102,7 +102,7 @@ class LinkedList:
             self.head = current.child.child
 
         if current and not current.child:
-            self.tail = current
+            self.tail = current.val
 
         self.size -= 1
 
@@ -124,7 +124,7 @@ class LinkedList:
             self.head = current.child.child
 
         if current and not current.child:
-            self.tail = current
+            self.tail = current.val
 
         self.size -= 1
 
