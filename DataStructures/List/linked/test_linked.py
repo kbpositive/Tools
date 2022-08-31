@@ -61,11 +61,11 @@ class TestLinkedList(unittest.TestCase):
         with self.subTest():
             self.assertEqual(L.tailEnd, "f")
 
-    # test remove at index
-    def test_remove_at_index(self):
+    def test_remove_index(self):
         pass
+
     # test remove at item
-    def test_remove_at_item(self):
+    def test_remove_item(self):
         pass
     
     # below code to be deleted
