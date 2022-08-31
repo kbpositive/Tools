@@ -31,10 +31,36 @@ class TestLinkedList(unittest.TestCase):
             self.assertEqual(L.length, 3)
         with self.subTest():
             self.assertEqual(L.tailEnd, 5)
-        
-    # test insert at item
+    
     def test_insert_at_item(self):
-        pass
+        L = linked.LinkedList()
+
+        with self.subTest():
+            self.assertEqual(L.length, 0)
+        with self.subTest():
+            self.assertEqual(L.tailEnd, None)
+
+        L.insert_at_item(1, None)
+
+        with self.subTest():
+            self.assertEqual(L.length, 1)
+        with self.subTest():
+            self.assertEqual(L.tailEnd, 1)
+
+        L.insert_at_item("f", None)
+
+        with self.subTest():
+            self.assertEqual(L.length, 2)
+        with self.subTest():
+            self.assertEqual(L.tailEnd, "f")
+
+        L.insert_at_item([10], "f")
+
+        with self.subTest():
+            self.assertEqual(L.length, 3)
+        with self.subTest():
+            self.assertEqual(L.tailEnd, "f")
+
     # test remove at index
     def test_remove_at_index(self):
         pass
