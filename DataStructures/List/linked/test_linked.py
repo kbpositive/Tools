@@ -2,7 +2,7 @@ import unittest
 import linked
 
 class TestLinkedList(unittest.TestCase):
-    # test insert at index
+    
     def test_insert_at_index(self):
         L = linked.LinkedList()
 
