@@ -134,4 +134,4 @@ class LinkedList:
 
     @property
     def tailEnd(self):
-        return self.tail.val
+        return self.tail.val if self.tail else self.tail
