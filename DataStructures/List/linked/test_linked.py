@@ -62,7 +62,36 @@ class TestLinkedList(unittest.TestCase):
             self.assertEqual(L.tailEnd, "f")
 
     def test_remove_index(self):
-        pass
+        L = linked.LinkedList()
+        L.insert_at_index(1, 0)
+        L.insert_at_index(5, 1)
+        L.insert_at_index(7, 0)
+
+        with self.subTest():
+            self.assertEqual(L.length, 3)
+        with self.subTest():
+            self.assertEqual(L.tailEnd, 5)
+        
+        L.remove_index(2)
+
+        with self.subTest():
+            self.assertEqual(L.length, 2)
+        with self.subTest():
+            self.assertEqual(L.tailEnd, 1)
+        
+        L.remove_index(1)
+
+        with self.subTest():
+            self.assertEqual(L.length, 1)
+        with self.subTest():
+            self.assertEqual(L.tailEnd, 7)
+        
+        L.remove_index(0)
+
+        with self.subTest():
+            self.assertEqual(L.length, 0)
+        with self.subTest():
+            self.assertEqual(L.tailEnd, None)
 
     # test remove at item
     def test_remove_item(self):
