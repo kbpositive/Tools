@@ -4,7 +4,7 @@ class Node:
         self.child = child
 
 
-class Linked_List:
+class LinkedList:
     def __init__(self, head=None, size=0):
         self.head = head
         self.size = size
