@@ -4,7 +4,7 @@ class Node:
         self.child = child
 
 
-class List:
+class Linked_List:
     def __init__(self, head=None, size=0):
         self.head = head
         self.size = size
@@ -138,7 +138,7 @@ class List:
 
 
 if __name__ == "__main__":
-    L = List()
+    L = Linked_List()
     items = [3, 2, 1, 9, 8, 7, 6, 5, 4, 0]
 
     for item in items:
@@ -148,7 +148,7 @@ if __name__ == "__main__":
     assert L.length == 10
     assert L.tail.val == 0
 
-    G = List()
+    G = Linked_List()
 
     G.insert_at_index(3, 0)
     G.insert_at_index(2, 1)
@@ -165,7 +165,7 @@ if __name__ == "__main__":
     assert L.length == 13
     assert L.tail.val == 0
 
-    G = List()
+    G = Linked_List()
 
     G.insert_at_item(3, None)
     G.insert_at_item(5, 3)
