@@ -3,18 +3,45 @@ import linked
 
 class TestLinkedList(unittest.TestCase):
     # test insert at index
-    def test_insert_at_index():
-        pass
+    def test_insert_at_index(self):
+        L = linked.LinkedList()
+
+        with self.subTest():
+            self.assertEqual(L.length, 0)
+        with self.subTest():
+            self.assertEqual(L.tailEnd, None)
+
+        L.insert_at_index(1, 0)
+
+        with self.subTest():
+            self.assertEqual(L.length, 1)
+        with self.subTest():
+            self.assertEqual(L.tailEnd, 1)
+
+        L.insert_at_index(5, 1)
+
+        with self.subTest():
+            self.assertEqual(L.length, 2)
+        with self.subTest():
+            self.assertEqual(L.tailEnd, 5)
+
+        L.insert_at_index(7, 0)
+
+        with self.subTest():
+            self.assertEqual(L.length, 3)
+        with self.subTest():
+            self.assertEqual(L.tailEnd, 5)
+        
     # test insert at item
-    def test_insert_at_item():
+    def test_insert_at_item(self):
         pass
     # test remove at index
-    def test_remove_at_index():
+    def test_remove_at_index(self):
         pass
     # test remove at item
-    def test_remove_at_item():
+    def test_remove_at_item(self):
         pass
-    
+
     L = linked.LinkedList()
     items = [3, 2, 1, 9, 8, 7, 6, 5, 4, 0]
 
