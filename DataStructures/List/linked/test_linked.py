@@ -2,7 +2,7 @@ import unittest
 import linked
 
 class TestLinkedList(unittest.TestCase):
-    
+
     def test_insert_at_index(self):
         L = linked.LinkedList()
 
@@ -41,7 +41,8 @@ class TestLinkedList(unittest.TestCase):
     # test remove at item
     def test_remove_at_item(self):
         pass
-
+    
+    # below code to be deleted
     L = linked.LinkedList()
     items = [3, 2, 1, 9, 8, 7, 6, 5, 4, 0]
 
