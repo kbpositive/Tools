@@ -96,13 +96,13 @@ class LinkedList:
         if index != 0:
             raise Exception("Index out of range.")
 
-        if current.child != self.head:
-            current.child = current.child.child
-        else:
+        if current.child == self.head:
             self.head = current.child.child
+        
+        current.child = current.child.child
 
         if current and not current.child:
-            self.tail = current.val
+            self.tail = current
 
         self.size -= 1
 
@@ -118,13 +118,13 @@ class LinkedList:
         if current.child is None or current.child.val != search:
             raise Exception("Item not found")
 
-        if current.child != self.head:
-            current.child = current.child.child
-        else:
+        if current.child == self.head:
             self.head = current.child.child
+        
+        current.child = current.child.child
 
         if current and not current.child:
-            self.tail = current.val
+            self.tail = current
 
         self.size -= 1
 
