@@ -67,32 +67,23 @@ class Tree:
         return output
 
     def insert(self, item):
-        # if tree is not empty
         if self.root:
-
-            # create iterator and set to root
             current = self.root
+            
+            while (
+                [current.left,current.right][current.val < item]
+                and current.val != item
+                ):
+                current = [current.left, current.right][current.val < item]
 
-            # while a next node exists, and current value is not item
-            while {0: current.left, 1: current.right}[
-                current.val < item
-            ] and current.val != item:
-
-                # set current node to next based on whether current.val < item
-                current = {0: current.left, 1: current.right}[current.val < item]
-
-            # if current value is equal to item, the item is a duplicate
             if current.val == item:
                 raise Exception("Item already exists.")
 
-            # set next value (based on whether current value < item) to new node
-            setattr(current, {0: "left", 1: "right"}[current.val < item], Node(item))
+            setattr(current, ["left","right"][current.val < item], Node(item))
 
-        # otherwise, set root to the inserted item
         else:
             self.root = Node(item)
 
-        # increment tree size by 1
         self.size += 1
 
     def remove(self, item):
