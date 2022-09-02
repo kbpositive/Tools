@@ -1,3 +1,5 @@
+from collections import deque
+
 class Node:
     def __init__(self, val=0, left=None, right=None):
         self.val = val
@@ -17,16 +19,16 @@ class Tree:
 
         output = []
         if order == "pre" or order == "level":
-            stack = [self.root]
+            stack = deque([self.root])
         else:
             stack = [[self.root, None]]
 
         if order == "level":
             while stack:
-                current = stack.pop(0)
+                current = stack.popleft()
                 if current:
                     output.append(current.val)
-                    stack.extend([current.left, current.right])
+                    stack.extend(deque([current.left, current.right]))
 
         elif order == "pre":
             while stack:
